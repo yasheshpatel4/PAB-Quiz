@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import Defaultquiz from "./Defaultquiz";
 
 // Import components for Admin and Student
 
@@ -72,7 +73,7 @@ function Home() {
                         </button>
                     </div>
                     <nav className="mt-4">
-                        {[{ label: "Dashboard", icon: "M3 10h11M9 21V3M21 10h-6m0 0v11" },
+                        {[{ label: "Dashboard", icon: "M3 10h11M9 21V3M21 10h-6m0 0v11"  },
                         { label: "Admin", icon: "M12 8.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7zM19 12l1.5-2.5-2.5-1.5L17 7l-1.5 2.5-2.5-1.5L12 7l-1.5 2.5-2.5-1.5L7 7l-1.5 2.5-2.5-1.5L5 12l-1.5 2.5 2.5 1.5L7 17l1.5-2.5 2.5 1.5L12 17l1.5-2.5 2.5 1.5L17 17l1.5-2.5L19 12z" },
                         { label: "Student", icon: "M8 16H4a1 1 0 01-1-1V9a1 1 0 011-1h4m12 12h-4a1 1 0 01-1-1V9a1 1 0 011-1h4m-6 0h6m-6 0h-6" }].map((item, index) => (
                             <Link
@@ -100,7 +101,6 @@ function Home() {
                         ))}
                     </nav>
                 </div>
-
                 {/* Overlay for mobile */}
                 {isSidebarOpen && (
                     <div
@@ -111,6 +111,10 @@ function Home() {
 
                 {/* Main content area where components will be rendered */}
 
+                <div className="flex-1 p-1 ml-28 mt-10 ">
+                    <Defaultquiz />
+                </div>
+            
             </div>
 
     );

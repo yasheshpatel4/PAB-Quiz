@@ -4,22 +4,27 @@ import './App.css'
 import Home from './Home/Home'
 import StudentDashboard from './Student/StudentDashboard'
 import Defaultquiz from './Home/Defaultquiz'
+import LoginSignup from './LoginSignup'
+import Category from './Admin/Category'
+import ManageExam from './Admin/ManageExam'
 
 function App() {
-
-  <BrowserRouter>
-    <Routes>
-      <Route path="/admin" element={<AdminDasboard />} />
-      <Route path="/student" element={<StudentDashboard />} />
-      <Route path="/" element={<Home />} />
-    </Routes>
-  </BrowserRouter>
 
   return (
     <>
       <BrowserRouter>
-        <Home />
+        <Routes>
+          <Route path="/admin" element={<LoginSignup />} />
+          <Route path="/admin/dashboard" element={<AdminDasboard />} />
+          <Route path='/admin/category' element={<Category />} />
+          <Route path="/admin/manage-exam" element={<ManageExam/>} />
+          <Route path="/student" element={<StudentDashboard />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/dashboard" element={<Home />} />
+          <Route path="/admin/logout" element={<Home />} />
+        </Routes>
       </BrowserRouter>
+
     </>
   )
 }

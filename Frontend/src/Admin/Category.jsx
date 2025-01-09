@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Sidebar from '../Sidebar';
-import Navbar from '../Navbar';
+import Sidebar from '../Components/Sidebar';
+import Navbar from '../Components/Navbar';
 
 function Category() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);

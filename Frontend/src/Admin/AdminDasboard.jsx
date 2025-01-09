@@ -1,33 +1,33 @@
 import React, { useState } from "react";
-import { Link, Outlet } from "react-router-dom";  // Outlet for nested routes
-import Navbar from "../Navbar";
-import Sidebar from "../Sidebar";
+import { Link, Outlet } from "react-router-dom";
+import Navbar from "../Components/Navbar";
+import Sidebar from "../Components/Sidebar";
 
 function AdminDashboard() {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Sidebar open by default
-    const [selectedItem, setSelectedItem] = useState("Dashboard"); // Set default selected item
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [selectedItem, setSelectedItem] = useState("Dashboard");
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };
 
     const handleItemClick = (item) => {
-        setSelectedItem(item); // Set the clicked item as selected
+        setSelectedItem(item);
     };
 
     return (
         <div className="flex h-screen">
-            
-            {/* Top Navbar */}
-      <Navbar toggleSidebar={toggleSidebar} />
 
-      {/* Sidebar */}
-      <Sidebar
-        isSidebarOpen={isSidebarOpen}
-        toggleSidebar={toggleSidebar}
-        selectedItem={selectedItem}
-        handleItemClick={handleItemClick}
-      />
+            {/* Top Navbar */}
+            <Navbar toggleSidebar={toggleSidebar} />
+
+            {/* Sidebar */}
+            <Sidebar
+                isSidebarOpen={isSidebarOpen}
+                toggleSidebar={toggleSidebar}
+                selectedItem={selectedItem}
+                handleItemClick={handleItemClick}
+            />
 
             {/* Overlay for mobile */}
             {isSidebarOpen && (

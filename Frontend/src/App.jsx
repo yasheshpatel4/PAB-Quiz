@@ -4,7 +4,7 @@ import './App.css'
 import Home from './Home/Home'
 import StudentDashboard from './Student/StudentDashboard'
 import Defaultquiz from './Home/Defaultquiz'
-import LoginSignup from './LoginSignup'
+import LoginSignup from './Admin/LoginSignup'
 import Category from './Admin/Category'
 import ManageExam from './Admin/ManageExam'
 
@@ -21,7 +21,7 @@ function App() {
           <Route path="/student" element={<StudentDashboard />} />
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Home />} />
-          <Route path="/admin/logout" element={<Home />} />
+          <Route path="/admin/logout" element={<Home />} /> 
         </Routes>
       </BrowserRouter>
 

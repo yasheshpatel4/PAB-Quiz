@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Defaultquiz from "./Defaultquiz";
 
-// Import components for Admin and Student
-
 function Home() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [selectedItem, setSelectedItem] = useState("Dashboard");
@@ -78,9 +76,9 @@ function Home() {
                         { label: "Student", icon: "M8 16H4a1 1 0 01-1-1V9a1 1 0 011-1h4m12 12h-4a1 1 0 01-1-1V9a1 1 0 011-1h4m-6 0h6m-6 0h-6" }].map((item, index) => (
                             <Link
                                 key={index}
-                                to={`/${item.label.toLowerCase()}`} // Update routing to dynamically link
+                                to={`/${item.label.toLowerCase()}`} 
                                 className={`flex items-center px-4 py-2 text-gray-200 hover:bg-gray-700 ${selectedItem === item.label ? "bg-gray-700" : ""}`}
-                                onClick={() => handleItemClick(item.label)} // Handle click to change selected item
+                                onClick={() => handleItemClick(item.label)} 
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"

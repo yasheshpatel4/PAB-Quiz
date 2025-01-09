@@ -1,10 +1,9 @@
-// src/components/LoginSignup.jsx
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const LoginSignup = () => {
-    const [isSignup, setIsSignup] = useState(false); // Switch between login and signup form
+    const [isSignup, setIsSignup] = useState(false); 
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -13,12 +12,43 @@ const LoginSignup = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Handle form submission (e.g., send data to server or validate inputs)
-        const isConfirmed = window.confirm("signup successful");
-        if (isConfirmed) {
-            // Redirect to another page if confirmed
-            navigate("/admin/dashboard"); // Use navigate() to change routes in React Router v6
+
+        const data = {
+            name: name,
+            email: email,
+            password: password,
+        };
+
+        if (isSignup) {
+            
+            axios
+                .post('http://localhost:8080/auth/signup', data)
+                .then((response) => {
+                    const isConfirmed = window.confirm("Signup successful");
+                    if (isConfirmed) {
+                        navigate("/admin/dashboard");
+                    }
+                })
+                .catch((error) => {
+                    alert('Error: ' + error.response?.data || 'Something went wrong');
+                });
+        } else {
+           
+            axios
+                .post('http://localhost:8080/auth/login', data)
+                .then((response) => {
+                    localStorage.setItem("authToken", response.data.token);
+                    const isConfirmed = window.confirm("Signup successful");
+                    if (isConfirmed) {
+                        navigate("/admin/dashboard");
+                    }
+                })
+                .catch((error) => {
+                    alert('Error: ' + error.response?.data || 'Login failed');
+                });
         }
+
+
     };
 
     return (

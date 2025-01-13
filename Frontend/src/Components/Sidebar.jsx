@@ -41,9 +41,19 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar, selectedItem, handleItemClick }
                 ].map((item, index) => (
                     <Link
                         key={index}
-                        to={`/admin/${item.label.toLowerCase().replace(/\s+/g, '-')}`} // This will handle spaces and ensure URL encoding
-                        className={`flex items-center px-4 py-2 text-gray-200 hover:bg-gray-700 ${selectedItem === item.label ? "bg-gray-700" : ""}`}
-                        onClick={() => handleItemClick(item.label)} // Handle click to change selected item
+                        to={
+                            item.label === "Logout"
+                                ? "/" 
+                                : `/admin/${item.label.toLowerCase().replace(/\s+/g, '-')}` 
+                        }
+                        className={`flex items-center px-4 py-2 text-gray-200 hover:bg-gray-700 ${selectedItem === item.label ? "bg-gray-700" : ""
+                            }`}
+                        onClick={() => {
+                            if (item.label === "Logout") {
+                                localStorage.removeItem('isAuthenticated'); 
+                            }
+                            handleItemClick(item.label); 
+                        }}
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"

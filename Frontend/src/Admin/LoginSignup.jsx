@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -24,8 +24,9 @@ const LoginSignup = () => {
             axios
                 .post('http://localhost:8080/auth/signup', data)
                 .then((response) => {
-                    const isConfirmed = window.confirm("Signup successful");
+                    const isConfirmed = window.confirm(response.data.message);
                     if (isConfirmed) {
+                        localStorage.setItem('isAuthenticated', 'true');
                         navigate("/admin/dashboard");
                     }
                 })
@@ -37,8 +38,8 @@ const LoginSignup = () => {
             axios
                 .post('http://localhost:8080/auth/login', data)
                 .then((response) => {
-                    localStorage.setItem("authToken", response.data.token);
-                    const isConfirmed = window.confirm("Signup successful");
+
+                    const isConfirmed = window.confirm(response.data.message);
                     if (isConfirmed) {
                         navigate("/admin/dashboard");
                     }

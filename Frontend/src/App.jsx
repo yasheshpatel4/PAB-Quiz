@@ -7,6 +7,7 @@ import Defaultquiz from './Home/Defaultquiz'
 import LoginSignup from './Admin/LoginSignup'
 import Category from './Admin/Category'
 import ManageExam from './Admin/ManageExam'
+import { LuLogOut } from 'react-icons/lu'
 
 function App() {
 
@@ -21,7 +22,7 @@ function App() {
           <Route path="/student" element={<StudentDashboard />} />
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Home />} />
-          <Route path="/admin/logout" element={<Home />} /> 
+          <Route path="/admin/logout" element={<LuLogOut />} /> 
         </Routes>
       </BrowserRouter>
 

@@ -9,16 +9,27 @@ import java.util.Optional;
 
 @Service
 public class SignUpservice {
+
     @Autowired
     private Repoadmin adminRepository;
 
-    public Admin registerAdmin(Admin admin){
-        return adminRepository.save(admin);
+    public String registerAdmin(Admin admin){
+
+        Admin existingAdmin = adminRepository.findByEmail(admin.getEmail());
+
+        if (existingAdmin != null) {
+            return "Error: Email already exists!";
+        }
+
+        adminRepository.save(admin);
+        return "Admin registered successfully!";
     }
+
     public Optional<Admin> loginUser(String email, String password) {
-        Optional<Admin> admin = Optional.ofNullable(adminRepository.findByEmail(email));
-        if (admin.isPresent() && admin.get().getPassword().equals(password)) {
-            return admin;
+        Admin admin = adminRepository.findByEmail(email);
+
+        if (admin != null && admin.getPassword().equals(password)) {
+            return Optional.of(admin);
         }
         return Optional.empty();
     }

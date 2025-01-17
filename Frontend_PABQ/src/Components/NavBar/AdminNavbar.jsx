@@ -24,7 +24,7 @@ const AdminNavbar = (props) => {
                     } md:translate-x-0 transition-transform duration-300 w-64 z-50`}
             >
                 <div className="flex items-center justify-between px-4 py-3 bg-gray-900 md:block">
-                    <h1 className="text-lg font-bold">PABQ-QUIZ</h1>
+                    <h1 className="text-lg font-bold">PAB-QUIZ</h1>
                     <button
                         className="text-white text-2xl md:hidden"
                         onClick={toggleNavbar}
@@ -53,7 +53,7 @@ const AdminNavbar = (props) => {
             >
                 ☰
             </button>
-            <div className="flex-1 md:ml-60 bg-gray-100 overflow-y-auto p-6">
+            <div className="flex-1 md:ml-32 bg-gray-100 overflow-y-auto p-6">
                 <div>{props.children}</div>
             </div> 
         </div>

@@ -10,8 +10,7 @@ const AdminNavbar = (props) => {
     };
 
     const links = [
-        { path: "/admin", label: "Admin Dashboard" },
-        { path: "/admin/manage-exam", label: "Manage Exam" },
+        { path: "/admin", label: "Dashboard" },
         { path: "/admin/performance", label: "Performance" },
         { path: "/admin/students", label: "Students" },
         { path: "/admin/logout", label: "Logout" },
@@ -53,7 +52,7 @@ const AdminNavbar = (props) => {
             >
                 ☰
             </button>
-            <div className="flex-1 md:ml-32 bg-gray-100 overflow-y-auto p-6">
+            <div className="flex-1 md:ml-60 bg-gray-100 overflow-y-auto p-6">
                 <div>{props.children}</div>
             </div> 
         </div>
@@ -61,3 +60,4 @@ const AdminNavbar = (props) => {
 };
 
 export default AdminNavbar;
+

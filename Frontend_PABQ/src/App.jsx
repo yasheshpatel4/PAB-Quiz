@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
-import AdminDashboard from "./Components/Admin(Faculty)/AdminDashBoard";
-import ManageExam from "./Components/Admin(Faculty)/ManageExam";
+import Dashboard from "./Components/Admin(Faculty)/Dashboard";
+// import ManageExam from "./Components/Admin(Faculty)/ManageExam";
 import Performance from "./Components/Admin(Faculty)/Performance";
 import Students from "./Components/Admin(Faculty)/Students";
 import AdminNavbar from "./Components/NavBar/AdminNavbar";
@@ -22,8 +22,8 @@ const App = () => {
         element={
           <AdminNavbar>
             <Routes>
-              <Route path="/" element={<AdminDashboard />} />
-              <Route path="manage-exam" element={<ManageExam />} />
+              <Route path="/" element={<Dashboard />} />
+              {/* <Route path="manage-exam" element={<ManageExam />} /> */}
               <Route path="performance" element={<Performance />} />
               <Route path="students" element={<Students />} />
               <Route path="logout" element={<LogOut/>}/>

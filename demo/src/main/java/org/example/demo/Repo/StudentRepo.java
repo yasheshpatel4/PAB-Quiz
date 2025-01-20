@@ -1,4 +1,14 @@
 package org.example.demo.Repo;
 
-public interface StudentRepo {
+import org.example.demo.Model.Student;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface StudentRepo extends JpaRepository<Student, String> {
+    /// find by all value because all value is unique
+    List<Student> findByEmailAndStudentIDAndRollNumber(String email, String studentID, String rollNumber);
 }

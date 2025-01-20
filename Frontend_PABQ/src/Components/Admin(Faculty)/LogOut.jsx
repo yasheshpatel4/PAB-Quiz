@@ -4,7 +4,7 @@ function LogOut() {
     return (
         <>
             <AdminNavbar>
-                <h1>logpout</h1>
+                <h1>Comming soon.....</h1>
             </AdminNavbar>
         </>
     )

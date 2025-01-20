@@ -10,8 +10,9 @@ const AdminNavbar = (props) => {
     };
 
     const links = [
-        { path: "/admin", label: "Dashboard" },
-        { path: "/admin/performance", label: "Performance" },
+        { path: "/admin", label: "Admin Dashboard" },
+        // { path: "/admin/manage-exam", label: "Manage Exam" },
+        { path: "/admin/performance", label: "Register Student" },
         { path: "/admin/students", label: "Students" },
         { path: "/admin/logout", label: "Logout" },
     ];
@@ -20,7 +21,7 @@ const AdminNavbar = (props) => {
         <div className="flex h-screen">
             <div
                 className={`fixed inset-y-0 left-0 bg-gray-800 text-white transform ${isOpen ? "translate-x-0" : "-translate-x-full"
-                    } md:translate-x-0 transition-transform duration-300 w-64 z-50`}
+                    } md:translate-x-0 transition-transform duration-300 w-60 z-50`}
             >
                 <div className="flex items-center justify-between px-4 py-3 bg-gray-900 md:block">
                     <h1 className="text-lg font-bold">PAB-QUIZ</h1>
@@ -52,7 +53,7 @@ const AdminNavbar = (props) => {
             >
                 ☰
             </button>
-            <div className="flex-1 md:ml-60 bg-gray-100 overflow-y-auto p-6">
+            <div className="flex-1 ml-20">
                 <div>{props.children}</div>
             </div> 
         </div>
@@ -60,4 +61,3 @@ const AdminNavbar = (props) => {
 };
 
 export default AdminNavbar;
-

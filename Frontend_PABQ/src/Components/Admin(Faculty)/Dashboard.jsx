@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const Dashboard = () => {
@@ -26,12 +26,8 @@ const Dashboard = () => {
   const fetchDashboardData = async () => {
     try {
       const studentsResponse = await axios.get('http://localhost:8080/auth/admin/noofstudents');
-      const quizzesResponse = await axios.get('http://localhost:8080/auth/admin/noofquizzes');
-      const resultsResponse = await axios.get('http://localhost:8080/auth/admin/quizresults');
-
-      setTotalStudents(studentsResponse.data);
-      setTotalQuizzes(quizzesResponse.data);
-      setQuizResults(resultsResponse.data);
+      console.log('Fetched Total Students:', studentsResponse.data); 
+      setTotalStudents(studentsResponse.data); 
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     }
@@ -67,7 +63,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto p-20">
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">

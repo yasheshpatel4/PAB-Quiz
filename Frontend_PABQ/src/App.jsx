@@ -12,6 +12,7 @@ import StudentNavbar from "./Components/NavBar/StudentNavbar";
 import DefaultQuiz from "./Components/MainDashBoard/DefaultQuiz";
 import AdminLoginAndSignup from "./Components/MainDashBoard/AdminLoginAndSignup";
 import StudentLogin from "./Components/MainDashBoard/StudentLogin";
+import Quiz from "./Components/Admin(Faculty)/Quiz";
 
 const App = () => {
   return (
@@ -26,7 +27,7 @@ const App = () => {
               {/* <Route path="manage-exam" element={<ManageExam />} /> */}
               <Route path="performance" element={<Performance />} />
               <Route path="students" element={<Students />} />
-              <Route path="logout" element={<LogOut/>}/>
+              <Route path="logout" element={<LogOut />} />
             </Routes>
           </AdminNavbar>
         }
@@ -53,12 +54,11 @@ const App = () => {
               <Route path="/" element={< DefaultQuiz/>} />
               <Route path="adminlogin" element={<AdminLoginAndSignup />} />
               <Route path="studentlogin" element={<StudentLogin />} />
+              <Route path="quiz" element={<Quiz/>}/>
             </Routes>
           </StudentNavbar>
         }
       />
-
-
 
     </Routes>
   );

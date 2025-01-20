@@ -10,8 +10,8 @@ const EnterNavbar = ({ children }) => {
     };
 
     const links = [
-        { path: "/admin", label: "Admin" },
-        { path: "/student", label: "Student" },
+        { path: "/adminlogin", label: "Faculty" },
+        { path: "/studentlogin", label: "Student" },
     ];
 
     return (

@@ -1,16 +1,14 @@
-import React from 'react'
-import EnterNavbar from "../navbar/EnterNavbar"
+import EnterNavbar from "../NavBar/EnterNavbar"
 import Demofile from "./Demofile"
 
 function DefaultQuiz() {
-    return (
-        <EnterNavbar>
-            <div className="h-full">
-                <Demofile />
-            </div>
-        </EnterNavbar>
-    )
+  return (
+      <>
+          <EnterNavbar>
+              <Demofile/>
+          </EnterNavbar>
+      </>
+  )
 }
 
 export default DefaultQuiz
-

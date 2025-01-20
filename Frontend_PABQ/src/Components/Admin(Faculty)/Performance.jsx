@@ -1,10 +1,9 @@
 import AdminNavbar from "../NavBar/AdminNavbar";
-import Demo from "./Demo";
 function Performance() {
     return (
         <>
             <AdminNavbar>
-                <Demo/>
+                <h1>comming soon.....</h1>
             </AdminNavbar>
         </>
     )

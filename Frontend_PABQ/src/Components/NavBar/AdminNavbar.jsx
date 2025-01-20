@@ -12,7 +12,7 @@ const AdminNavbar = (props) => {
     const links = [
         { path: "/admin", label: "Admin Dashboard" },
         // { path: "/admin/manage-exam", label: "Manage Exam" },
-        { path: "/admin/performance", label: "Register Student" },
+        { path: "/admin/performance", label: "Performance" },
         { path: "/admin/students", label: "Students" },
         { path: "/admin/logout", label: "Logout" },
     ];

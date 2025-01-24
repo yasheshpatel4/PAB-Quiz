@@ -1,9 +1,10 @@
-
 package org.example.demo.Model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import java.util.List;
 
 @Entity
 @Getter
@@ -20,6 +21,20 @@ public class Admin {
 
     @Column(name = "admin_pass")
     private String password;
+
+    @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Student> students;
+
+    public void addStudent(Student student) {
+        students.add(student);
+        student.setAdmin(this);
+    }
+
+    public void removeStudent(Student student) {
+        students.remove(student);
+        student.setAdmin(null);
+    }
 
     public String getEmail() {
         return email;
@@ -43,5 +58,13 @@ public class Admin {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<Student> getStudents() {
+        return students;
+    }
+
+    public void setStudents(List<Student> students) {
+        this.students = students;
     }
 }

@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import Dashboard from "./Components/Admin(Faculty)/Dashboard";
+import Dashboard from "./Components/Admin(Faculty)/admindashboard/Dashboard";
 // import ManageExam from "./Components/Admin(Faculty)/ManageExam";
 import Performance from "./Components/Admin(Faculty)/Performance";
 import Students from "./Components/Admin(Faculty)/Students";
@@ -51,10 +51,10 @@ const App = () => {
         element={
           <StudentNavbar>
             <Routes>
-              <Route path="/" element={< DefaultQuiz/>} />
+              <Route path="/" element={< DefaultQuiz />} />
               <Route path="adminlogin" element={<AdminLoginAndSignup />} />
               <Route path="studentlogin" element={<StudentLogin />} />
-              <Route path="quiz" element={<Quiz/>}/>
+              <Route path="quiz" element={<Quiz />} />
             </Routes>
           </StudentNavbar>
         }

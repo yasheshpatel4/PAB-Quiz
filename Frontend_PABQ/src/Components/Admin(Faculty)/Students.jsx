@@ -2,6 +2,7 @@ import AdminNavbar from "../NavBar/AdminNavbar";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import StudentUpload from "./StudentUpload";
+import { Search, Upload, Trash2, Edit2, AlertCircle, LoaderCircle } from "lucide-react";
 
 function Students() {
   const [students, setStudents] = useState([]);
@@ -15,7 +16,8 @@ function Students() {
     const fetchStudents = async () => {
       try {
         const response = await axios.get("http://localhost:8080/auth/admin/getallstudents");
-        setStudents(response.data);
+        const studentsData = Array.isArray(response.data) ? response.data : [];
+        setStudents(studentsData);
       } catch (err) {
         console.error("Error fetching students:", err);
         setError("Failed to fetch students. Please try again later.");
@@ -44,167 +46,184 @@ function Students() {
     }
   };
 
-  const filteredStudents = students.filter((student) => {
-    const matchesSearchQuery =
-      (student.name?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
-      (student.email?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
-      (student.rollNumber?.toLowerCase() || "").includes(searchQuery.toLowerCase());
+  const filteredStudents = Array.isArray(students)
+    ? students.filter((student) => {
+      const matchesSearchQuery =
+        (student.name?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+        (student.email?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+        (student.rollNumber?.toLowerCase() || "").includes(searchQuery.toLowerCase());
 
-    const matchesSemesterFilter = semesterFilter 
-    ? student.sem === semesterFilter 
-    : true;
+      const matchesSemesterFilter = semesterFilter
+        ? student.sem === semesterFilter
+        : true;
 
-    return matchesSearchQuery && matchesSemesterFilter;
-  });
+      return matchesSearchQuery && matchesSemesterFilter;
+    })
+    : [];
 
   const toggleUpload = () => {
-    setShowUpload(!showUpload)
+    setShowUpload(!showUpload);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="flex flex-col items-center gap-3">
+          <LoaderCircle className="w-8 h-8 text-indigo-600 animate-spin" />
+          <p className="text-gray-600 font-medium">Loading students...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6 border border-red-200">
+          <div className="flex items-center gap-3 text-red-600 mb-4">
+            <AlertCircle className="w-6 h-6" />
+            <h2 className="text-lg font-semibold">Error</h2>
+          </div>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button
+            onClick={() => setError("")}
+            className="w-full py-2 px-4 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200"
+          >
+            Dismiss
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!Array.isArray(students) || students.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <p className="text-xl text-gray-600 font-medium">No students found.</p>
+      </div>
+    );
   }
 
   return (
-    <>
-      <AdminNavbar>
-        <div className="container mx-auto p-14">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6">Student List</h1>
-          {error && (
-            <div className="mb-4 p-4 bg-red-100 text-red-700 border border-red-300 rounded-lg">
-              {error}
+    <AdminNavbar>
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto p-6 sm:p-8 md:p-10">
+          <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8">
+            <div className="flex justify-between items-center mb-8">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+                Student Management
+              </h1>
               <button
-                onClick={() => setError("")}
-                className="ml-4 text-sm text-red-500 hover:underline focus:outline-none"
+                onClick={toggleUpload}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors duration-200"
               >
-                Dismiss
+                {showUpload ? (
+                  <>Back to List</>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4" />
+                    Upload Students
+                  </>
+                )}
               </button>
             </div>
-          )}
 
-          {!showUpload && (
-            <>
-              <div className="mb-4 flex justify-between items-center">
-                <input
-                  type="text"
-                  placeholder="Search by name, email, roll number"
-                  className="px-4 py-2 border rounded-lg w-full max-w-xs"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <select
-                  className="px-4 py-2 border rounded-lg ml-4"
-                  value={semesterFilter}
-                  onChange={(e) => setSemesterFilter(e.target.value)}
-                >
-                  <option value="">All Semesters</option>
-                  <option value="1">Semester 1</option>
-                  <option value="2">Semester 2</option>
-                  <option value="3">Semester 3</option>
-                  <option value="4">Semester 4</option>
-                  <option value="5">Semester 5</option>
-                  <option value="6">Semester 6</option>
-                  <option value="7">Semester 7</option>
-                  <option value="8">Semester 8</option>
-                </select>
-              </div>
+            {!showUpload && (
+              <>
+                <div className="mb-6 flex flex-col sm:flex-row gap-4">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      type="text"
+                      placeholder="Search by name, email, roll number..."
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+                  <select
+                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white min-w-[200px]"
+                    value={semesterFilter}
+                    onChange={(e) => setSemesterFilter(e.target.value)}
+                  >
+                    <option value="">All Semesters</option>
+                    {[...Array(8)].map((_, i) => (
+                      <option key={i + 1} value={i + 1}>{`Semester ${i + 1}`}</option>
+                    ))}
+                  </select>
+                </div>
 
-
-
-              {loading ? (
-                <p className="text-gray-600 text-center">Loading...</p>
-              ) : filteredStudents.length === 0 ? (
-                <p className="text-gray-600 text-center">No students found.</p>
-              ) : (
-                <div className="overflow-x-auto bg-white shadow-md rounded-lg">
+                <div className="overflow-x-auto rounded-lg border border-gray-200">
                   <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-100">
+                    <thead className="bg-gray-50">
                       <tr>
-                        <th
-                          scope="col"
-                          className="py-3 px-6 text-left text-sm font-medium text-gray-600 uppercase tracking-wider"
-                        >
-                          #
-                        </th>
-                        <th
-                          scope="col"
-                          className="py-3 px-6 text-left text-sm font-medium text-gray-600 uppercase tracking-wider"
-                        >
-                          Name
-                        </th>
-                        <th
-                          scope="col"
-                          className="py-3 px-6 text-left text-sm font-medium text-gray-600 uppercase tracking-wider"
-                        >
-                          Email
-                        </th>
-                        <th
-                          scope="col"
-                          className="py-3 px-6 text-left text-sm font-medium text-gray-600 uppercase tracking-wider"
-                        >
-                          Roll Number
-                        </th>
-                        <th
-                          scope="col"
-                          className="py-3 px-6 text-left text-sm font-medium text-gray-600 uppercase tracking-wider"
-                        >
-                          Semester
-                        </th>
-                        <th
-                          scope="col"
-                          className="py-3 px-6 text-left text-sm font-medium text-gray-600 uppercase tracking-wider"
-                        >
-                          Student ID
-                        </th>
-                        <th
-                          scope="col"
-                          className="py-3 px-6 text-left text-sm font-medium text-gray-600 uppercase tracking-wider"
-                        >
-                          Actions
-                        </th>
+                        {["#", "Name", "Email", "Roll Number", "Semester", "Student ID", "Actions"].map(
+                          (header) => (
+                            <th
+                              key={header}
+                              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                              {header}
+                            </th>
+                          )
+                        )}
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {filteredStudents.map((student, index) => (
-                        <tr key={student.studentID} className="hover:bg-gray-50">
-                          <td className="py-4 px-6 text-sm font-medium text-gray-900 text-center">{index + 1}</td>
-                          <td className="py-4 px-6 text-sm text-gray-800">{student.name}</td>
-                          <td className="py-4 px-6 text-sm text-gray-600">{student.email}</td>
-                          <td className="py-4 px-6 text-sm text-gray-800">{student.rollNumber}</td>
-                          <td className="py-4 px-6 text-sm text-gray-800">{student.sem}</td>
-                          <td className="py-4 px-6 text-sm text-gray-800">{student.studentID}</td>
-                          <td className="py-4 px-6 text-sm flex items-center space-x-4">
-                            <button
-                              onClick={() => handleUpdate(student.studentID)}
-                              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none"
-                            >
-                              Update
-                            </button>
-                            <button
-                              onClick={() => handleDelete(student.studentID)}
-                              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none"
-                            >
-                              Delete
-                            </button>
+                        <tr
+                          key={student.studentID}
+                          className="hover:bg-gray-50 transition-colors duration-200"
+                        >
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {index + 1}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
+                            {student.name}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {student.email}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {student.rollNumber}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {student.sem}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {student.studentID}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleUpdate(student.studentID)}
+                                className="p-1 text-blue-600 hover:text-blue-800 transition-colors duration-200"
+                                title="Edit student"
+                              >
+                                <Edit2 className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(student.studentID)}
+                                className="p-1 text-red-600 hover:text-red-800 transition-colors duration-200"
+                                title="Delete student"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
-              )}
-            </>
-          )}
+              </>
+            )}
 
-          <div className="mt-6 flex justify-center">
-            <button
-              onClick={toggleUpload}
-              className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:-translate-y-1"
-            >
-              {showUpload ? "Back to Student List" : "Upload Students"}
-            </button>
+            {showUpload && <StudentUpload />}
           </div>
-
-          {showUpload && <StudentUpload />}
         </div>
-      </AdminNavbar>
-    </>
+      </div>
+    </AdminNavbar>
   );
 }
 

@@ -42,12 +42,23 @@ public class SignUpservice {
         return Optional.empty();
     }
 
-    public String addStudentData(Student s) {
-        List<Student> students = studentRepository.findByEmailAndStudentIDAndRollNumber(s.getEmail(), s.getStudentID(), s.getRollNumber());
-        if (!students.isEmpty()) {
+    public String addStudentData(Student student, String adminEmail) {
+        Admin admin = adminRepository.findByEmail(adminEmail);
+        if (admin == null) {
+            return "Error: Admin not found!";
+        }
+
+        // Check if the student already exists
+        List<Student> existingStudents = studentRepository.findByEmailAndStudentIDAndRollNumber(
+                student.getEmail(), student.getStudentID(), student.getRollNumber());
+        if (!existingStudents.isEmpty()) {
             return "Error: Student already exists!";
         }
-        studentRepository.save(s);
+
+        // Associate the student with the admin
+        student.setAdmin(admin);
+        studentRepository.save(student);
+
         return "Student added successfully!";
     }
 

@@ -2,7 +2,9 @@ package org.example.demo.Services;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.example.demo.Model.Admin;
 import org.example.demo.Model.Student;
+import org.example.demo.Repo.Repoadmin;
 import org.example.demo.Repo.StudentRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StudentService {
@@ -20,12 +23,19 @@ public class StudentService {
     @Autowired
     private StudentRepo studentRepo;
 
-    public void saveStudentsFromExcel(MultipartFile file) throws IOException {
-        List<Student> students = parseExcelFile(file);
+    @Autowired
+    private Repoadmin adminRepo;
+
+    public void saveStudentsFromExcel(MultipartFile file, String adminEmail) throws IOException {
+        // Validate admin existence
+        Admin admin = adminRepo.findByEmail(adminEmail);
+
+        // Parse Excel file and associate students with the admin
+        List<Student> students = parseExcelFile(file, admin);
         studentRepo.saveAll(students);
     }
 
-    private List<Student> parseExcelFile(MultipartFile file) throws IOException {
+    private List<Student> parseExcelFile(MultipartFile file, Admin admin) throws IOException {
         List<Student> students = new ArrayList<>();
 
         try (InputStream is = file.getInputStream();
@@ -36,9 +46,7 @@ public class StudentService {
             int rowNumber = 0;
             while (rows.hasNext()) {
                 Row currentRow = rows.next();
-
-                // Skip header row
-                if (rowNumber == 0) {
+                if (rowNumber == 0) { // Skip header row
                     rowNumber++;
                     continue;
                 }
@@ -49,6 +57,7 @@ public class StudentService {
                 student.setEmail(getCellValueAsString(currentRow.getCell(2)));
                 student.setRollNumber(getCellValueAsString(currentRow.getCell(3)));
                 student.setSem(getCellValueAsString(currentRow.getCell(4)));
+                student.setAdmin(admin); // Associate student with admin
 
                 students.add(student);
             }

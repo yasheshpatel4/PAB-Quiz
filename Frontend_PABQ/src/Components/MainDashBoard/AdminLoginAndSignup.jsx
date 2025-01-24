@@ -41,8 +41,9 @@ const LoginSignup = () => {
         setMessage("");
 
         if (isSignup) {
+            // Sign up logic
             axios
-                .post('http://localhost:8080/auth/admin/signup', data)
+                .post("http://localhost:8080/auth/admin/signup", data)
                 .then((response) => {
                     alert(response.data);
                     setName("");
@@ -50,35 +51,42 @@ const LoginSignup = () => {
                     setPassword("");
                 })
                 .catch((error) => {
-                    setMessage('Error: ' + error.response?.data || 'Something went wrong');
+                    setMessage("Error: " + (error.response?.data || "Something went wrong"));
                 });
         } else {
+            // Login logic
             axios
-                .post('http://localhost:8080/auth/admin/login', data)
+                .post("http://localhost:8080/auth/admin/login", data)
                 .then((response) => {
-                    alert(response.data)
-                    navigate("/admin");
+                    alert(response.data);
+                    // Save admin email in localStorage
+                    localStorage.setItem("adminEmail", email);
+                    navigate("/admin"); // Redirect to admin dashboard
                     setName("");
                     setEmail("");
                     setPassword("");
                 })
                 .catch((error) => {
-                    setMessage('Error: ' + error.response?.data || 'Login failed');
+                    setMessage("Error: " + (error.response?.data || "Login failed"));
                 });
         }
     };
 
+
     return (
-        <div className="flex justify-center items-center min-h-screen bg-gray-100">
-            <div className="bg-white p-8 rounded-lg shadow-lg w-96">
-                <h2 className="text-2xl font-bold text-center mb-6">
+        <div className="flex justify-center items-center min-h-screen">
+            <div className="bg-white p-10 rounded-2xl shadow-2xl w-96 transform transition-all duration-300 hover:scale-105">
+                <h2 className="text-3xl font-extrabold text-center mb-6 text-gray-800">
                     {isSignup ? "Faculty Sign Up" : "Faculty Login"}
                 </h2>
 
                 <form onSubmit={handleSubmit}>
                     {isSignup && (
                         <div className="mb-4">
-                            <label htmlFor="name" className="block text-sm font-medium text-gray-600">
+                            <label
+                                htmlFor="name"
+                                className="block text-sm font-semibold text-gray-700"
+                            >
                                 Full Name
                             </label>
                             <input
@@ -88,13 +96,16 @@ const LoginSignup = () => {
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 required
-                                className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition duration-300"
                             />
                         </div>
                     )}
 
                     <div className="mb-4">
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-600">
+                        <label
+                            htmlFor="email"
+                            className="block text-sm font-semibold text-gray-700"
+                        >
                             Email Address
                         </label>
                         <input
@@ -104,12 +115,15 @@ const LoginSignup = () => {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
-                            className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition duration-300"
                         />
                     </div>
 
                     <div className="mb-6">
-                        <label htmlFor="password" className="block text-sm font-medium text-gray-600">
+                        <label
+                            htmlFor="password"
+                            className="block text-sm font-semibold text-gray-700"
+                        >
                             Password
                         </label>
                         <input
@@ -119,30 +133,32 @@ const LoginSignup = () => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
-                            className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition duration-300"
                         />
                     </div>
 
                     {message && (
-                        <div className="mb-4 text-center text-red-500">
+                        <div className="mb-4 text-center text-red-600 font-medium">
                             {message}
                         </div>
                     )}
 
                     <button
                         type="submit"
-                        className="w-full py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg shadow-md hover:shadow-lg transform transition-all duration-300 hover:scale-105"
                     >
                         {isSignup ? "Sign Up" : "Log In"}
                     </button>
 
-                    <div className="mt-4 text-center">
+                    <div className="mt-6 text-center">
                         <button
                             type="button"
                             onClick={() => setIsSignup(!isSignup)}
-                            className="text-blue-500 hover:underline"
+                            className="text-indigo-600 font-semibold hover:underline"
                         >
-                            {isSignup ? "Already have an account? Log In" : "Don't have an account? Sign Up"}
+                            {isSignup
+                                ? "Already have an account? Log In"
+                                : "Don't have an account? Sign Up"}
                         </button>
                     </div>
                 </form>

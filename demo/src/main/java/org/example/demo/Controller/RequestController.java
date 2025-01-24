@@ -1,5 +1,8 @@
 package org.example.demo.Controller;
 
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.example.demo.Model.Admin;
 import org.example.demo.Model.Student;
 import org.example.demo.Services.SignUpservice;
@@ -7,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +24,10 @@ public class RequestController {
     private SignUpservice signUpservice;
 
     @PostMapping("/admin/signup")
-    public ResponseEntity<String> registerAdmin(@RequestBody Admin admin) {
+    public ResponseEntity<String> registerAdmin(@RequestBody Admin admin, HttpServletRequest request) {
+
+        request.getSession().setAttribute("admin", admin);
+
         try {
             String result = signUpservice.registerAdmin(admin);
             if (result.equals("Error: Email already exists!")) {
@@ -32,10 +40,12 @@ public class RequestController {
     }
 
     @PostMapping("/admin/login")
-    public ResponseEntity<String> login(@RequestBody Admin admin) {
+    public ResponseEntity<String> login(@RequestBody Admin admin, HttpSession session) {
         Optional<Admin> loggedInUser = signUpservice.loginUser(admin.getEmail(), admin.getPassword());
 
         if (loggedInUser.isPresent()) {
+
+            session.setAttribute("adminEmail", loggedInUser.get().getEmail());
             return ResponseEntity.ok("Login successful for " + loggedInUser.get().getEmail());
         }
 
@@ -43,16 +53,29 @@ public class RequestController {
     }
 
     @PostMapping("/admin/addstudentdata")
-    public ResponseEntity<String> addStudentData(@RequestBody List<Student> students) {
+    public ResponseEntity<?> addStudentData(@RequestBody List<Student> students,@RequestParam String adminEmail) {
+        List<String> errors = new ArrayList<>();
+
+
+
+        if (adminEmail == null || adminEmail.isEmpty()) {
+            return ResponseEntity.status(400).body("Admin email is missing.");
+        }
+
         try {
             for (Student student : students) {
-                String result = signUpservice.addStudentData(student);
-                if (result.equals("Error: Email already exists!")) {
-                    return ResponseEntity.status(400).body(result);
+                String result = signUpservice.addStudentData(student, adminEmail);
+                if (result.startsWith("Error:")) {
+                    errors.add("Student " + student.getEmail() + ": " + result);
                 }
+            }
+
+            if (!errors.isEmpty()) {
+                return ResponseEntity.status(400).body(errors);
             }
             return ResponseEntity.ok("All students added successfully!");
         } catch (Exception e) {
+            e.printStackTrace(); // Log the exception
             return ResponseEntity.status(400).body("Error: " + e.getMessage());
         }
     }
@@ -78,5 +101,9 @@ public class RequestController {
         }
     }
 
-
+    @PostMapping("/admin/logout")
+    public ResponseEntity<String> logout(HttpSession session) {
+        session.invalidate();
+        return ResponseEntity.ok("Logout successful");
+    }
 }

@@ -7,20 +7,41 @@ import Button from './Button';
 
 const Dashboard = () => {
   const [totalStudents, setTotalStudents] = useState(0);
+  const [totalQuiz,setTotalQuiz] = useState(0)
   const [isStudentModalOpen, setIsStudentModalOpen] = useState(false);
   const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
   const [studentData, setStudentData] = useState([]);
   const [currentStudentIndex, setCurrentStudentIndex] = useState(0);
   const [numberOfStudents, setNumberOfStudents] = useState(1);
+  const [quiz, setQuiz] = useState([]);
   const [error, setError] = useState('');
+
   const [quizForm, setQuizForm] = useState({
-    title: '',
-    description: '',
-    duration: '',
+    QuizSubject: '',
+    QuizSem: '',
+    QuizDuration: 30,
+    QuizDescription: ''
   });
 
   useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/auth/admin/getallquiz");
+        const quizData = Array.isArray(response.data) ? response.data : [];
+        setQuiz(quizData);
+      } catch (err) {
+        console.error("Error fetching students:", err);
+        setError("Failed to fetch students. Please try again later.");
+      } finally {
+        console.log("")
+      }
+    };
+    fetchStudents();
+  }, []);
+
+  useEffect(() => {
     fetchDashboardData();
+    fetchDashboardQuiz();
   }, []);
 
   const fetchDashboardData = async () => {
@@ -29,6 +50,14 @@ const Dashboard = () => {
       setTotalStudents(response.data);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+    }
+  };
+  const fetchDashboardQuiz = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/auth/admin/noofquiz');
+      setTotalQuiz(response.data);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -104,23 +133,35 @@ const Dashboard = () => {
 
   const handleQuizSubmit = async (e) => {
     e.preventDefault();
+
+    const adminEmail = localStorage.getItem('adminEmail');
+
+    if (!adminEmail) {
+      console.error("Admin email is not available in localStorage");
+      return;
+    }
+
     try {
-      await axios.post('http://localhost:8080/auth/admin/createquiz', quizForm);
+      const response = await axios.post('http://localhost:8080/auth/admin/createquiz', quizForm, {
+        params: { adminEmail }
+      });
+      alert(response.data);
       setIsQuizModalOpen(false);
-      setQuizForm({ title: '', description: '', duration: '' });
-      fetchDashboardData();
+      setQuizForm({ QuizSubject: '', QuizSem: '', QuizDuration: '', QuizDescription: '' });
+      fetchDashboardQuiz();
     } catch (error) {
       console.error('Error creating quiz:', error);
     }
   };
 
+
   return (
-    <div className="container mx-auto p-20">
+    <div className="ml-32 container mx-auto p-20">
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <DashboardCard title="Total Students :" value={totalStudents} description="View the total number of students currently registered in the system." />
         <DashboardCard title="Add Student :" handleOpenModal={() => setIsStudentModalOpen(true)} description="Register new students to the system with their details." />
-        <DashboardCard title="Create Quiz :" handleOpenModal={() => setIsQuizModalOpen(true)} description="Set up a new quiz with title, description, and duration." />
+        <DashboardCard title="Create Quiz :" value={totalQuiz} handleOpenModal={() => setIsQuizModalOpen(true)} description="Set up a new quiz with title, description, and duration." />
       </div>
 
       {isStudentModalOpen && (
@@ -185,28 +226,57 @@ const Dashboard = () => {
         <Modal title="Create Quiz" handleCloseModal={() => setIsQuizModalOpen(false)}>
           <form onSubmit={handleQuizSubmit}>
             <Input
-              label="Quiz Title"
-              name="title"
-              value={quizForm.title}
+              label="Quiz Subject"
+              name="QuizSubject"
+              value={quizForm.QuizSubject}
               onChange={(e) => setQuizForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))}
             />
+
             <Input
-              label="Description"
-              name="description"
-              value={quizForm.description}
-              onChange={(e) => setQuizForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))}
+              type="number"
+              name="QuizSem"
+              label="Quiz Semester"
+              min="1"
+              max="8"
+              value={quizForm.QuizSem}
+              onChange={(e) => {
+                const value = Number(e.target.value);
+                if (value >= 1 && value <= 8) {
+                  setQuizForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+                }
+              }}
+              placeholder="Enter Semester (1-8)"
+              step="1" // Ensures increment by 1
             />
+
+
+
+            {/* QuizDuration (with min 30 and max 60) */}
             <Input
               label="Duration (minutes)"
-              name="duration"
+              name="QuizDuration"
               type="number"
-              value={quizForm.duration}
+              value={quizForm.QuizDuration}
+              onChange={(e) => {
+                const value = Math.max(30, Math.min(60, Number(e.target.value))); // Ensure value is between 30 and 60
+                setQuizForm((prev) => ({ ...prev, QuizDuration: value }));
+              }}
+              min="30"
+              max="60"
+            />
+
+            <Input
+              label="Quiz Description"
+              name="QuizDescription"
+              value={quizForm.QuizDescription}
               onChange={(e) => setQuizForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))}
             />
+
             <Button type="submit">Create Quiz</Button>
           </form>
         </Modal>
       )}
+      
     </div>
   );
 };

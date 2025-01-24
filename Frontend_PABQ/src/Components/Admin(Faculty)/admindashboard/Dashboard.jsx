@@ -12,9 +12,9 @@ const Dashboard = () => {
   const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
   const [studentData, setStudentData] = useState([]);
   const [currentStudentIndex, setCurrentStudentIndex] = useState(0);
-  const [numberOfStudents, setNumberOfStudents] = useState  (1);
-  const [quiz, setQuiz] = useState([]);
+  const [numberOfStudents, setNumberOfStudents] = useState(1);
   const [error, setError] = useState('');
+
 
   const [quizForm, setQuizForm] = useState({
     QuizSubject: '',
@@ -141,10 +141,7 @@ const Dashboard = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:8080/auth/admin/createquiz', quizForm, {
-        params: { adminEmail },
-      });
-      alert(response.data);
+      await axios.post('http://localhost:8080/auth/admin/createquiz', quizForm);
       setIsQuizModalOpen(false);
       setQuizForm({ QuizSubject: '', QuizSem: '', QuizDuration: '', QuizDescription: '' });
       fetchDashboardQuiz();
@@ -155,7 +152,7 @@ const Dashboard = () => {
 
 
   return (
-    <div className="container mx-auto p-20">
+    <div className="ml-32 container mx-auto p-20">
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <DashboardCard title="Total Students :" value={totalStudents} description="View the total number of students currently registered in the system." />
@@ -275,9 +272,6 @@ const Dashboard = () => {
           </form>
         </Modal>
       )}
-
-      
-
     </div>
   );
 };

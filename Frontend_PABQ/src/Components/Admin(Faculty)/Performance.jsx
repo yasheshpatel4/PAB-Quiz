@@ -3,7 +3,7 @@ function Performance() {
     return (
         <>
             <AdminNavbar>
-                <h1>comming soon.....</h1>
+                <h1 className="ml-32">comming soon.....</h1>
             </AdminNavbar>
         </>
     )

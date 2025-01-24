@@ -51,7 +51,7 @@ const StudentNavbar = (props) => {
             >
                 ☰
             </button>
-            <div className="flex-1 md:ml-60 bg-gray-100 overflow-y-auto">
+            <div className="flex-1 md:ml-32 bg-gray-100 overflow-y-auto">
                 <div className="p-6">{props.children}</div>
             </div>
         </div>

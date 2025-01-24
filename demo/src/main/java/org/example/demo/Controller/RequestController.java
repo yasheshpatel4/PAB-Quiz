@@ -4,9 +4,13 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.example.demo.Model.Admin;
+import org.example.demo.Model.Quiz;
 import org.example.demo.Model.Student;
+import org.example.demo.Repo.QuizRepository;
+import org.example.demo.Repo.Repoadmin;
 import org.example.demo.Services.SignUpservice;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,9 +58,9 @@ public class RequestController {
 
     @PostMapping("/admin/addstudentdata")
     public ResponseEntity<?> addStudentData(@RequestBody List<Student> students,@RequestParam String adminEmail) {
+
+        System.out.printf("addStudentData" + students);
         List<String> errors = new ArrayList<>();
-
-
 
         if (adminEmail == null || adminEmail.isEmpty()) {
             return ResponseEntity.status(400).body("Admin email is missing.");
@@ -106,4 +110,20 @@ public class RequestController {
         session.invalidate();
         return ResponseEntity.ok("Logout successful");
     }
+
+    @PostMapping("/admin/createquiz")
+    public ResponseEntity<String> createQuiz(@RequestBody Quiz quiz, @RequestParam String adminEmail) {
+        System.out.printf(quiz.toString());
+       String result = signUpservice.addQuiz(quiz, adminEmail);
+       if(result.equals("Error: Email already exists!")) {
+           return ResponseEntity.status(400).body(result);
+       }
+       return ResponseEntity.ok("Quiz created successfully");
+    }
+
+    @GetMapping("/admin/noofquiz")
+    public int getTotalQuiz() {
+        return signUpservice.getTotalQuiz();
+    }
+
 }

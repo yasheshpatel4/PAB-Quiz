@@ -67,4 +67,26 @@ public class Admin {
     public void setStudents(List<Student> students) {
         this.students = students;
     }
+
+    @OneToMany(mappedBy = "admin_obj" , cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Quiz> quizzes;
+
+    public List<Quiz> getQuizzes() {
+        return quizzes;
+    }
+
+    public void setQuizzes(List<Quiz> quizzes) {
+        this.quizzes = quizzes;
+    }
+
+    @Override
+    public String toString() {
+        return "Admin{" +
+                "email='" + email + '\'' +
+                ", name='" + name + '\'' +
+                ", password='" + password + '\'' +
+                ", students=" + students +
+                ", quizzes=" + quizzes +
+                '}';
+    }
 }

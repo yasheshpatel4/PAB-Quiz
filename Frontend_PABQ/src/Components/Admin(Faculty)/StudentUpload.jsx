@@ -6,6 +6,7 @@ function StudentUpload() {
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("idle");
+  const [adminEmail, setAdminEmail] = useState(localStorage.getItem('adminEmail'));
   
   const handleFileChange = (e) => {
     if (e.target.files) {
@@ -60,18 +61,6 @@ function StudentUpload() {
         </div>
 
         <div className="space-y-6">
-          {/* Admin Email Input */}
-          <div>
-            <input
-              type="email"
-              id="admin-email"
-              value={adminEmail}
-              onChange={(e) => setAdminEmail(e.target.value)}
-              className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition duration-300"
-              placeholder="Enter admin email"
-              required
-            />
-          </div>
 
           {/* File Upload Input */}
           <div className="relative">

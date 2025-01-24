@@ -1,10 +1,11 @@
 package org.example.demo.Services;
 
 import org.example.demo.Model.Admin;
+import org.example.demo.Model.Quiz;
 import org.example.demo.Model.Student;
+import org.example.demo.Repo.QuizRepository;
 import org.example.demo.Repo.Repoadmin;
 import org.example.demo.Repo.StudentRepo;
-import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,9 @@ public class SignUpservice {
 
     @Autowired
     private StudentRepo studentRepository;
+
+    @Autowired
+    private QuizRepository quizRepository;
 
     public String registerAdmin(Admin admin){
 
@@ -48,7 +52,6 @@ public class SignUpservice {
             return "Error: Admin not found!";
         }
 
-        // Check if the student already exists
         List<Student> existingStudents = studentRepository.findByEmailAndStudentIDAndRollNumber(
                 student.getEmail(), student.getStudentID(), student.getRollNumber());
         if (!existingStudents.isEmpty()) {
@@ -86,4 +89,21 @@ public class SignUpservice {
         }
     }
 
+    public String addQuiz(Quiz quiz , String adminEmail) {
+        System.out.printf("Adding Quiz %s\n", quiz);
+        Admin admin = adminRepository.findByEmail(adminEmail);
+        if (admin == null) {
+            return "Error: Admin not found!";
+        }
+        quiz.setAdmin_obj(admin);
+        quizRepository.save(quiz);
+
+        return "Quiz added successfully!";
+    }
+
+    public int getTotalQuiz() {
+        long ans = quizRepository.count();
+        int total = (int) ans;
+        return total;
+    }
 }

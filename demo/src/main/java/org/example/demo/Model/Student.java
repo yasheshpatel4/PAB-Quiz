@@ -79,4 +79,16 @@ public class Student {
     public void setAdmin(Admin admin) {
         this.admin = admin;
     }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "admin=" + admin +
+                ", studentID='" + studentID + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", rollNumber='" + rollNumber + '\'' +
+                ", sem='" + sem + '\'' +
+                '}';
+    }
 }

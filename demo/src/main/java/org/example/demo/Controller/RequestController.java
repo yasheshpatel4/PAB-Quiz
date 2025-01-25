@@ -113,7 +113,7 @@ public class RequestController {
 
     @PostMapping("/admin/createquiz")
     public ResponseEntity<String> createQuiz(@RequestBody Quiz quiz, @RequestParam String adminEmail) {
-        System.out.printf(quiz.toString());
+
        String result = signUpservice.addQuiz(quiz, adminEmail);
        if(result.equals("Error: Email already exists!")) {
            return ResponseEntity.status(400).body(result);
@@ -124,6 +124,22 @@ public class RequestController {
     @GetMapping("/admin/noofquiz")
     public int getTotalQuiz() {
         return signUpservice.getTotalQuiz();
+    }
+
+    @GetMapping("/admin/getallquiz")
+    public ResponseEntity<List<Quiz>> getAllQuiz() {
+        return signUpservice.getAllQuiz();
+    }
+
+    @DeleteMapping("/admin/deletequiz/{id}")
+    public ResponseEntity<String> deletequiz(@PathVariable int id) {
+        System.out.println("Received delete request for ID: " + id);
+        boolean deleted = signUpservice.deletequiz(id);
+        if (deleted) {
+            return ResponseEntity.ok("Quiz deleted successfully");
+        } else {
+            return ResponseEntity.status(404).body("Quiz not found");
+        }
     }
 
 }

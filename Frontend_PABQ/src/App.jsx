@@ -13,6 +13,7 @@ import DefaultQuiz from "./Components/MainDashBoard/DefaultQuiz";
 import AdminLoginAndSignup from "./Components/MainDashBoard/AdminLoginAndSignup";
 import StudentLogin from "./Components/MainDashBoard/StudentLogin";
 import Quiz from "./Components/Admin(Faculty)/Quiz";
+import PerformancePage from "./Components/Admin(Faculty)/PerformancePage";
 
 const App = () => {
   return (
@@ -26,6 +27,7 @@ const App = () => {
               <Route path="/" element={<Dashboard />} />
               {/* <Route path="manage-exam" element={<ManageExam />} /> */}
               <Route path="performance" element={<Performance />} />
+              <Route path="performance/:id" element={<PerformancePage/>} />
               <Route path="students" element={<Students />} />
               <Route path="logout" element={<LogOut />} />
             </Routes>

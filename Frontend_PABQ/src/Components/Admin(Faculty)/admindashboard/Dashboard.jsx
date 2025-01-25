@@ -4,6 +4,7 @@ import DashboardCard from './DashboardCard';
 import Modal from './Modal';
 import Input from './Input';
 import Button from './Button';
+import QuizDisplay from '../QuizDisplay';
 
 const Dashboard = () => {
   const [totalStudents, setTotalStudents] = useState(0);
@@ -23,21 +24,21 @@ const Dashboard = () => {
     QuizDescription: ''
   });
 
-  useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        const response = await axios.get("http://localhost:8080/auth/admin/getallquiz");
-        const quizData = Array.isArray(response.data) ? response.data : [];
-        setQuiz(quizData);
-      } catch (err) {
-        console.error("Error fetching students:", err);
-        setError("Failed to fetch students. Please try again later.");
-      } finally {
-        console.log("")
-      }
-    };
-    fetchStudents();
-  }, []);
+  // useEffect(() => {
+  //   const fetchStudents = async () => {
+  //     try {
+  //       const response = await axios.get("http://localhost:8080/auth/admin/getallquiz");
+  //       const quizData = Array.isArray(response.data) ? response.data : [];
+  //       setQuiz(quizData);
+  //     } catch (err) {
+  //       console.error("Error fetching students:", err);
+  //       setError("Failed to fetch students. Please try again later.");
+  //     } finally {
+  //       console.log("")
+  //     }
+  //   };
+  //   fetchStudents();
+  // }, []);
 
   useEffect(() => {
     fetchDashboardData();
@@ -141,7 +142,14 @@ const Dashboard = () => {
     }
 
     try {
-      await axios.post('http://localhost:8080/auth/admin/createquiz', quizForm);
+      console.log(quizForm);
+      console.log(adminEmail);
+      
+      
+      const response = await axios.post('http://localhost:8080/auth/admin/createquiz', quizForm, {
+        params: { adminEmail: adminEmail },
+      });
+      alert(response.data);
       setIsQuizModalOpen(false);
       setQuizForm({ QuizSubject: '', QuizSem: '', QuizDuration: '', QuizDescription: '' });
       fetchDashboardQuiz();
@@ -272,6 +280,9 @@ const Dashboard = () => {
           </form>
         </Modal>
       )}
+
+      <QuizDisplay/>
+      
     </div>
   );
 };

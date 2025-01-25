@@ -1,33 +1,46 @@
 package org.example.demo.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Getter
-@Setter
 @Table(name = "quiz_table")
 public class Quiz {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int Quizid;
 
-    @Column(name = "quiz_subject")
-    String QuizSubject;
+    @JsonProperty("QuizSubject")
+    private String QuizSubject;
 
-    @Column(name = "quiz_sem")
-    int QuizSem;
 
-    @Column(name = "quiz_duration")
-    int QuizDuration;
+    @JsonProperty("QuizSem")
+    private int QuizSem;
 
-    @Column(name = "quiz_description")
-    String QuizDescription;
+
+    @JsonProperty("QuizDuration")
+    private int QuizDuration;
+
+
+    @JsonProperty("QuizDescription")
+    private String QuizDescription;
 
     @ManyToOne
     @JoinColumn(name = "admin_email")
-    private Admin admin_obj;
+    @JsonBackReference
+    private Admin adminObj;
+
+    public int getQuizid() {
+        return Quizid;
+    }
+
+    public void setQuizid(int quizid) {
+        Quizid = quizid;
+    }
 
     public String getQuizSubject() {
         return QuizSubject;
@@ -61,12 +74,12 @@ public class Quiz {
         QuizDescription = quizDescription;
     }
 
-    public Admin getAdmin_obj() {
-        return admin_obj;
+    public Admin getAdminObj() {
+        return adminObj;
     }
 
-    public void setAdmin_obj(Admin admin_obj) {
-        this.admin_obj = admin_obj;
+    public void setAdminObj(Admin adminObj) {
+        this.adminObj = adminObj;
     }
 
     @Override
@@ -77,7 +90,8 @@ public class Quiz {
                 ", QuizSem=" + QuizSem +
                 ", QuizDuration=" + QuizDuration +
                 ", QuizDescription='" + QuizDescription + '\'' +
-                ", admin_obj=" + admin_obj +
+                ", admin_obj=" + adminObj +
                 '}';
     }
+
 }

@@ -90,12 +90,11 @@ public class SignUpservice {
     }
 
     public String addQuiz(Quiz quiz , String adminEmail) {
-        System.out.printf("Adding Quiz %s\n", quiz);
         Admin admin = adminRepository.findByEmail(adminEmail);
         if (admin == null) {
             return "Error: Admin not found!";
         }
-        quiz.setAdmin_obj(admin);
+        quiz.setAdminObj(admin);
         quizRepository.save(quiz);
 
         return "Quiz added successfully!";
@@ -105,5 +104,23 @@ public class SignUpservice {
         long ans = quizRepository.count();
         int total = (int) ans;
         return total;
+    }
+
+    public ResponseEntity<List<Quiz>> getAllQuiz() {
+        List<Quiz> quizzes = quizRepository.findAll();
+        if (quizzes.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(quizzes);
+    }
+
+    public boolean deletequiz(int id) {
+        Optional<Quiz> quizOptional = quizRepository.findById(id);
+        if (quizOptional.isPresent()) {
+            quizRepository.delete(quizOptional.get());
+            return true;
+        } else {
+            return false;
+        }
     }
 }

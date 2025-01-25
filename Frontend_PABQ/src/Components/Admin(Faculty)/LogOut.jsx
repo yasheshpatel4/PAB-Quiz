@@ -33,7 +33,7 @@ function LogOut() {
             <AdminNavbar>
                 <button
                     onClick={handleLogout}
-                    className="ml-32 px-6 py-3 text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all transform hover:scale-105 active:scale-95"
+                    className="ml-32 mt-20 px-6 py-3 text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all transform hover:scale-105 active:scale-95"
                 >
                     Logout
                 </button>

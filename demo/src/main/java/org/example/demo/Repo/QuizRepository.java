@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface QuizRepository extends JpaRepository<Quiz, Integer> {
     // Additional query methods if required
+
 }

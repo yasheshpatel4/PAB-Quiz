@@ -101,11 +101,7 @@ const Demofile = () => {
     ]
 
     return (
-<<<<<<< HEAD
         <div className="ml-28 bg-gray-50 min-h-full">
-=======
-        <div className="ml-32 bg-gray-50 min-h-full">
->>>>>>> 10e658ecb819446631a2475cc1f501b773bc135c
             <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6"> {/* Update 1 */}
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-3xl font-bold text-gray-800">Quiz Portal</h1>

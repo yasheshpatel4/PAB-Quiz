@@ -68,7 +68,7 @@ public class Admin {
         this.students = students;
     }
 
-    @OneToMany(mappedBy = "admin_obj" , cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "adminObj" , cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Quiz> quizzes;
 
     public List<Quiz> getQuizzes() {

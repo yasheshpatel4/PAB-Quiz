@@ -4,6 +4,7 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.example.demo.Model.Admin;
+import org.example.demo.Model.Question;
 import org.example.demo.Model.Quiz;
 import org.example.demo.Model.Student;
 import org.example.demo.Repo.QuizRepository;
@@ -44,12 +45,10 @@ public class RequestController {
     }
 
     @PostMapping("/admin/login")
-    public ResponseEntity<String> login(@RequestBody Admin admin, HttpSession session) {
+    public ResponseEntity<String> login(@RequestBody Admin admin) {
         Optional<Admin> loggedInUser = signUpservice.loginUser(admin.getEmail(), admin.getPassword());
 
         if (loggedInUser.isPresent()) {
-
-            session.setAttribute("adminEmail", loggedInUser.get().getEmail());
             return ResponseEntity.ok("Login successful for " + loggedInUser.get().getEmail());
         }
 
@@ -142,4 +141,30 @@ public class RequestController {
         }
     }
 
+    @PostMapping("/admin/addquestion")
+    public ResponseEntity<String> addQuestion(@RequestBody List<Question> question,@RequestParam int quizid) {
+        try{
+            for(Question q : question) {
+                String result = signUpservice.addQuestion(q,quizid);
+                if(result.equals("Error: Question already exists!")) {
+                    return ResponseEntity.status(400).body(result);
+                }
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(400).body("Error: " + e.getMessage());
+        }
+        return ResponseEntity.ok("Question added successfully");
+    }
+
+    @GetMapping("/admin/getallquestion")
+    public ResponseEntity<List<Question>> getAllQuestion(@RequestParam int quizid) {
+        return signUpservice.getallquestion(quizid);
+    }
+
+    @GetMapping("/admin/noofquestion")
+    public ResponseEntity<Integer> getTotalQuestion(@RequestParam int quizid) {
+        int ans =  signUpservice.getTotalQuestion(quizid);
+        return ResponseEntity.ok(ans);
+    }
 }

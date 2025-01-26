@@ -142,9 +142,7 @@ const Dashboard = () => {
     }
 
     try {
-      console.log(quizForm);
-      console.log(adminEmail);
-      
+
       
       const response = await axios.post('http://localhost:8080/auth/admin/createquiz', quizForm, {
         params: { adminEmail: adminEmail },

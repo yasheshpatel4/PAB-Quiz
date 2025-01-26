@@ -1,10 +1,13 @@
 package org.example.demo.Model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Table(name = "quiz_table")
@@ -17,14 +20,11 @@ public class Quiz {
     @JsonProperty("QuizSubject")
     private String QuizSubject;
 
-
     @JsonProperty("QuizSem")
     private int QuizSem;
 
-
     @JsonProperty("QuizDuration")
     private int QuizDuration;
-
 
     @JsonProperty("QuizDescription")
     private String QuizDescription;
@@ -70,6 +70,14 @@ public class Quiz {
         return QuizDescription;
     }
 
+    public List<Question> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(List<Question> questions) {
+        this.questions = questions;
+    }
+
     public void setQuizDescription(String quizDescription) {
         QuizDescription = quizDescription;
     }
@@ -82,16 +90,8 @@ public class Quiz {
         this.adminObj = adminObj;
     }
 
-    @Override
-    public String   toString() {
-        return "Quiz{" +
-                "Quizid=" + Quizid +
-                ", QuizSubject='" + QuizSubject + '\'' +
-                ", QuizSem=" + QuizSem +
-                ", QuizDuration=" + QuizDuration +
-                ", QuizDescription='" + QuizDescription + '\'' +
-                ", admin_obj=" + adminObj +
-                '}';
-    }
+    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Question> questions;
 
 }

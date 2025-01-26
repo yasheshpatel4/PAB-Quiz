@@ -1,46 +1,63 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import AdminNavbar from '../NavBar/AdminNavbar';
-import { AlertCircle, LoaderCircle, Trash2, Edit2 } from 'lucide-react';
+import { useState, useEffect } from "react"
+import axios from "axios"
+import AdminNavbar from "../NavBar/AdminNavbar"
+import { AlertCircle, LoaderCircle, Trash2, PlusCircle, Upload } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 
 const QuizDisplay = () => {
-  const [quiz, setQuiz] = useState([]);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [quiz, setQuiz] = useState([])
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(true)
+
+  const noofquestion = localStorage.getItem("question")
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/auth/admin/getallquiz');
-        const quizdata = Array.isArray(response.data) ? response.data : [];
-        setQuiz(quizdata);
+        const response = await axios.get("http://localhost:8080/auth/admin/getallquiz")
+        const quizdata = Array.isArray(response.data) ? response.data : []
+        setQuiz(quizdata)
       } catch (err) {
-        console.error('Error fetching quizzes:', err);
-        setError('Failed to fetch quizzes. Please try again later.');
+        console.error("Error fetching quizzes:", err)
+        setError("Failed to fetch quizzes. Please try again later.")
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-    fetchQuiz();
-  }, []);
+    }
+    fetchQuiz()
+  }, [])
 
   const handleUpdate = (id) => {
-    alert(`Update functionality for quiz ID: ${id}`);
-  };
+    alert(`Update functionality for quiz ID: ${ id }`)
+  }
+
+  const handleAddQuestion = (id) => {
+    localStorage.setItem("quizid", id);
+    navigate('/admin/addquestion')
+};
+
+
+  const handleUpload = (id) => {
+    alert(`Upload functionality for quiz ID: ${ id }`)
+  }
+
 
   const handleDelete = async (id) => {
-    const confirmed = window.confirm('Are you sure you want to delete this quiz?');
-    if (!confirmed) return;
+
+    const confirmed = window.confirm("Are you sure you want to delete this quiz?")
+    if (!confirmed) return
 
     try {
-      await axios.delete(`http://localhost:8080/auth/admin/deletequiz/${id}`);
-      setQuiz(quiz.filter((quiz) => quiz.Quizid !== id));
-      alert('Quiz deleted successfully.');
+      await axios.delete(`http://localhost:8080/auth/admin/deletequiz/${id}`)
+        setQuiz(quiz.filter((quiz) => quiz.Quizid !== id))
+      alert("Quiz deleted successfully.")
     } catch (err) {
-      console.error('Error deleting quiz:', err.response?.data || err.message);
-      setError(err.response?.data || 'Failed to delete quiz. Please try again.');
+      console.error("Error deleting quiz:", err.response?.data || err.message)
+      setError(err.response?.data || "Failed to delete quiz. Please try again.")
     }
-  };
+  }
 
   if (loading) {
     return (
@@ -50,7 +67,7 @@ const QuizDisplay = () => {
           <p className="text-gray-600 font-medium">Loading quizzes...</p>
         </div>
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -63,14 +80,14 @@ const QuizDisplay = () => {
           </div>
           <p className="text-gray-600 mb-4">{error}</p>
           <button
-            onClick={() => setError('')}
+            onClick={() => setError("")}
             className="w-full py-2 px-4 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200"
           >
             Dismiss
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   if (!Array.isArray(quiz) || quiz.length === 0) {
@@ -78,7 +95,7 @@ const QuizDisplay = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <p className="text-xl text-gray-600 font-medium">No quizzes found.</p>
       </div>
-    );
+    )
   }
 
   return (
@@ -87,7 +104,7 @@ const QuizDisplay = () => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              {['#', 'Quiz ID', 'Subject', 'Semester', 'Duration', 'Description', 'Actions'].map((header) => (
+              {["Quiz ID", "Subject", "Semester", "Duration", "Description", "Actions","noofquestion"].map((header) => (
                 <th
                   key={header}
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -98,13 +115,9 @@ const QuizDisplay = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {quiz.map((item, index) => (
-              <tr
-                key={item.Quizid} // Ensures each child in the list has a unique key
-                className="hover:bg-gray-50 transition-colors duration-200"
-              >
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{index + 1}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.Quizid}</td>
+            {quiz.map((item) => (
+              <tr key={item.quizid} className="hover:bg-gray-50 transition-colors duration-200">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.quizid}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.QuizSubject}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.QuizSem}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.QuizDuration}</td>
@@ -112,16 +125,26 @@ const QuizDisplay = () => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <div className="flex gap-2">
                     <button
-                      onClick={() => handleUpdate(item.Quizid)}
-                      className="p-1 text-blue-600 hover:text-blue-800 transition-colors duration-200"
-                      title="Edit quiz"
+                      onClick={() => handleAddQuestion(item.quizid)}
+                      className="p-1 text-green-600 hover:text-green-800 transition-colors duration-200"
+                      title="Add question"
                     >
-                      <Edit2 className="w-4 h-4" />
+                      <PlusCircle className="w-4 h-4" />
+                    </button>
+
+                    <button
+                      onClick={() => handleUpload(item.quizid)}
+                      className="p-1 text-blue-600 hover:text-blue-800 transition-colors duration-200"
+                      title="Upload"
+                      disabled={noofquestion.length == 0}
+                    >
+                    
+                      <Upload className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => handleDelete(item.Quizid)}
+                      onClick={() => handleDelete(item.quizid)}
                       className="p-1 text-red-600 hover:text-red-800 transition-colors duration-200"
-                      title="Delete quiz"
+                      title="Remove quiz"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -133,7 +156,7 @@ const QuizDisplay = () => {
         </table>
       </div>
     </AdminNavbar>
-  );
-};
+  )
+}
 
-export default QuizDisplay;
+export default QuizDisplay

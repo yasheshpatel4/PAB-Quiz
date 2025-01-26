@@ -1,8 +1,10 @@
 package org.example.demo.Services;
 
 import org.example.demo.Model.Admin;
+import org.example.demo.Model.Question;
 import org.example.demo.Model.Quiz;
 import org.example.demo.Model.Student;
+import org.example.demo.Repo.QuestionRepo;
 import org.example.demo.Repo.QuizRepository;
 import org.example.demo.Repo.Repoadmin;
 import org.example.demo.Repo.StudentRepo;
@@ -24,6 +26,9 @@ public class SignUpservice {
 
     @Autowired
     private QuizRepository quizRepository;
+
+    @Autowired
+    private QuestionRepo questionRepository;
 
     public String registerAdmin(Admin admin){
 
@@ -123,4 +128,41 @@ public class SignUpservice {
             return false;
         }
     }
+
+    public String addQuestion(Question question, int quizId) {
+        Optional<Quiz> optionalQuiz = quizRepository.findById(quizId);
+        if (optionalQuiz.isEmpty()) {
+            return "Error: Quiz not found!";
+        }
+
+        Quiz quiz = optionalQuiz.get();
+        List<Question> existingQuestions = questionRepository.findByQuiz(quiz);
+        for (Question existingQuestion : existingQuestions) {
+            if (existingQuestion.getQuestion().equalsIgnoreCase(question.getQuestion())) {
+                return "Error: Question already exists!";
+            }
+        }
+
+        question.setQuiz(quiz);
+        questionRepository.save(question);
+        return "Question added successfully!";
+    }
+
+    public ResponseEntity<List<Question>> getallquestion(int quizid) {
+
+        Quiz quiz = quizRepository.findById(quizid).get();
+        List<Question> questions = questionRepository.findByQuiz(quiz);
+
+        if (questions.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(questions);
+    }
+
+    public int getTotalQuestion(int quizid) {
+        Quiz quiz = quizRepository.findById(quizid).get();
+        List<Question> questions = questionRepository.findByQuiz(quiz);
+        return questions.size();
+    }
+
 }

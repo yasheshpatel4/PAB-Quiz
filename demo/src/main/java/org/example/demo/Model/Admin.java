@@ -69,6 +69,7 @@ public class Admin {
     }
 
     @OneToMany(mappedBy = "adminObj" , cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Quiz> quizzes;
 
     public List<Quiz> getQuizzes() {
@@ -79,14 +80,5 @@ public class Admin {
         this.quizzes = quizzes;
     }
 
-    @Override
-    public String toString() {
-        return "Admin{" +
-                "email='" + email + '\'' +
-                ", name='" + name + '\'' +
-                ", password='" + password + '\'' +
-                ", students=" + students +
-                ", quizzes=" + quizzes +
-                '}';
-    }
+
 }

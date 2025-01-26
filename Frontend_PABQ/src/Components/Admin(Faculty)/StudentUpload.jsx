@@ -6,7 +6,7 @@ function StudentUpload() {
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("idle");
-  const [adminEmail, setAdminEmail] = useState(localStorage.getItem('adminEmail'));
+  const [adminEmail, setAdminEmail] = useState("");
   
   const handleFileChange = (e) => {
     if (e.target.files) {

@@ -219,7 +219,7 @@ function Students() {
               </>
             )}
 
-            {showUpload || <StudentUpload />}
+            {showUpload && <StudentUpload />}
 
           </div>
         </div>

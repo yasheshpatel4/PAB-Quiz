@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -52,6 +53,15 @@ public class RequestController {
             return ResponseEntity.ok("Login successful for " + loggedInUser.get().getEmail());
         }
 
+        return ResponseEntity.status(401).body("Invalid credentials");
+    }
+
+    @PostMapping("/student/login")
+    public ResponseEntity<String> login(@RequestBody Student student) {
+        Optional<Student> loggedInUser = signUpservice.loginStudent(student.getEmail(),student.getStudentID());
+        if (loggedInUser.isPresent()) {
+            return ResponseEntity.ok("Login successful for " + loggedInUser.get().getEmail());
+        }
         return ResponseEntity.status(401).body("Invalid credentials");
     }
 
@@ -121,18 +131,18 @@ public class RequestController {
     }
 
     @GetMapping("/admin/noofquiz")
-    public int getTotalQuiz() {
-        return signUpservice.getTotalQuiz();
+    public int getTotalQuiz(@RequestParam String email) {
+        return signUpservice.getTotalQuiz(email);
     }
 
     @GetMapping("/admin/getallquiz")
-    public ResponseEntity<List<Quiz>> getAllQuiz() {
-        return signUpservice.getAllQuiz();
+    public ResponseEntity<List<Quiz>> getAllQuiz(@RequestParam String email) {
+
+        return signUpservice.getAllQuiz(email);
     }
 
     @DeleteMapping("/admin/deletequiz/{id}")
     public ResponseEntity<String> deletequiz(@PathVariable int id) {
-        System.out.println("Received delete request for ID: " + id);
         boolean deleted = signUpservice.deletequiz(id);
         if (deleted) {
             return ResponseEntity.ok("Quiz deleted successfully");
@@ -162,9 +172,48 @@ public class RequestController {
         return signUpservice.getallquestion(quizid);
     }
 
-    @GetMapping("/admin/noofquestion")
-    public ResponseEntity<Integer> getTotalQuestion(@RequestParam int quizid) {
+    @GetMapping("/admin/noofquestion/{quizid}")
+    public ResponseEntity<Integer> getTotalQuestion(@PathVariable int quizid) {
         int ans =  signUpservice.getTotalQuestion(quizid);
         return ResponseEntity.ok(ans);
     }
+
+    @PostMapping("/admin/upload/{quizid}")
+    public ResponseEntity<String> upload(@PathVariable int quizid){
+        String ans = signUpservice.uploadquiz(quizid);
+        return ResponseEntity.ok(ans);
+    }
+
+    @DeleteMapping("/admin/deletequestion/{questionid}")
+    public ResponseEntity<String> deleteQuestion(@PathVariable int questionid) {
+        boolean deleted = signUpservice.deletequestion(questionid);
+        if (deleted) {
+            return ResponseEntity.ok("Quiz deleted successfully");
+        } else {
+            return ResponseEntity.status(404).body("Quiz not found");
+        }
+    }
+
+    @PostMapping("/admin/uploadquestion/{quizid}")
+    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file, @PathVariable int  quizid) {
+
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("File is empty. Please upload a valid file.");
+        }
+
+        String fileType = file.getContentType();
+        if (fileType == null ||
+                (!fileType.equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") &&
+                        !fileType.equals("application/vnd.ms-excel"))) {
+            return ResponseEntity.badRequest().body("Invalid file type. Please upload an Excel file (.xlsx or .xls).");
+        }
+
+        try {
+            signUpservice.saveQuestionToExcel(file, quizid);
+            return ResponseEntity.ok("File uploaded successfully and processed.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error uploading file: " + e.getMessage());
+        }
+    }
+
 }

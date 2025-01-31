@@ -1,10 +1,14 @@
 package org.example.demo.Controller;
 
+import jakarta.servlet.http.HttpSession;
+import org.example.demo.Model.Quiz;
 import org.example.demo.Services.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/students")
@@ -39,4 +43,14 @@ public class StudentController {
         }
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpSession session) {
+        session.invalidate();
+        return ResponseEntity.ok("Logout successful");
+    }
+
+    @GetMapping("/allquiz")
+    public List<Quiz> getQuizzes(@RequestParam String studentEmail, @RequestParam String studentID) {
+        return studentService.getallquiz(studentEmail,studentID);
+    }
 }

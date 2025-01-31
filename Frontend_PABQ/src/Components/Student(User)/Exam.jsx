@@ -1,6 +1,34 @@
-import StudentNavbar from "../NavBar/StudentNavbar"
+import { useState, useEffect } from "react";
+import StudentNavbar from "../NavBar/StudentNavbar";
+import axios from "axios";
 
 function Exam() {
+  const [exams, setExams] = useState([]);
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+
+    const fetchExams = async () => {
+      try {
+
+        const response = await axios.get("http://localhost:8080/api/students/allquiz", {
+          params: { studentEmail: localStorage.getItem("studentEmail"), studentID: localStorage.getItem("studentID") }
+
+        });
+        setExams(response.data);
+      } catch (error) {
+        console.error("Error fetching exams:", error);
+      }
+    };
+
+    fetchExams();
+  }, []);
+
+  // Filter exams based on search input
+  const filteredExams = exams.filter((exam) =>
+    exam.QuizDescription.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div className="flex h-screen bg-gray-100">
       <StudentNavbar />
@@ -13,6 +41,8 @@ function Exam() {
                 <input
                   type="search"
                   placeholder="Search..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
                   className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
@@ -24,10 +54,10 @@ function Exam() {
                 <thead>
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Title
+                      Subject
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Exam Date
+                      Topic
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
@@ -38,25 +68,38 @@ function Exam() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  <tr>
-                    <td className="px-6 py-4 whitespace-nowrap">Knowledge</td>
-                    <td className="px-6 py-4 whitespace-nowrap">2023-12-30</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                        Finished
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <button className="text-emerald-600 hover:text-emerald-900">View Result</button>
-                    </td>
-                  </tr>
+                  {filteredExams.length > 0 ? (
+                    filteredExams.map((exam) => (
+                      <tr key={exam.quizid}>
+                        <td className="px-6 py-4 whitespace-nowrap">{exam.QuizSubject}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">{exam.QuizDescription}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                              ${exam.status === "Finished" ? "bg-green-100 text-green-800" :
+                                exam.status === "Pending" ? "bg-red-100 text-red-800" :
+                                  "bg-red-200 text-gray-800"}`}>
+                            {exam.status || "Pending"}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <button className="text-emerald-600 hover:text-emerald-900">View {exam.status === "Finished" ? "Result" : "Details"}</button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="4" className="px-6 py-4 text-center text-gray-500">No exams found</td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
 
-              {/* Pagination */}
+              {/* Pagination (Static for now) */}
               <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
                 <div className="flex-1 flex justify-between items-center">
-                  <p className="text-sm text-gray-700">Showing 1 to 1 of 1 entries</p>
+                  <p className="text-sm text-gray-700">
+                    Showing {filteredExams.length} of {exams.length} entries
+                  </p>
                   <div className="flex space-x-2">
                     <button className="px-3 py-1 border rounded text-sm">Previous</button>
                     <button className="px-3 py-1 border rounded text-sm bg-emerald-500 text-white">1</button>
@@ -64,13 +107,13 @@ function Exam() {
                   </div>
                 </div>
               </div>
+
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default Exam
-
+export default Exam;

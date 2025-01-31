@@ -11,4 +11,5 @@ import java.util.List;
 public interface StudentRepo extends JpaRepository<Student, String> {
     /// find by all value because all value is unique
     List<Student> findByEmailAndStudentIDAndRollNumber(String email, String studentID, String rollNumber);
+    Student findByEmailAndStudentID(String email, String studentID);
 }

@@ -24,22 +24,6 @@ const Dashboard = () => {
     QuizDescription: ''
   });
 
-  // useEffect(() => {
-  //   const fetchStudents = async () => {
-  //     try {
-  //       const response = await axios.get("http://localhost:8080/auth/admin/getallquiz");
-  //       const quizData = Array.isArray(response.data) ? response.data : [];
-  //       setQuiz(quizData);
-  //     } catch (err) {
-  //       console.error("Error fetching students:", err);
-  //       setError("Failed to fetch students. Please try again later.");
-  //     } finally {
-  //       console.log("")
-  //     }
-  //   };
-  //   fetchStudents();
-  // }, []);
-
   useEffect(() => {
     fetchDashboardData();
     fetchDashboardQuiz();
@@ -53,9 +37,12 @@ const Dashboard = () => {
       console.error('Error fetching dashboard data:', error);
     }
   };
+
   const fetchDashboardQuiz = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/auth/admin/noofquiz');
+      const response = await axios.get('http://localhost:8080/auth/admin/noofquiz', {
+        params: { email: localStorage.getItem("adminEmail") }
+      });
       setTotalQuiz(response.data);
     } catch (error) {
       console.log(error);

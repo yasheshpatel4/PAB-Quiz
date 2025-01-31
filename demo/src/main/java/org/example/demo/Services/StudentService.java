@@ -3,10 +3,14 @@ package org.example.demo.Services;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.example.demo.Model.Admin;
+import org.example.demo.Model.Quiz;
 import org.example.demo.Model.Student;
+import org.example.demo.Repo.QuizRepository;
 import org.example.demo.Repo.Repoadmin;
 import org.example.demo.Repo.StudentRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +29,9 @@ public class StudentService {
 
     @Autowired
     private Repoadmin adminRepo;
+
+    @Autowired
+    private QuizRepository quizRepo;
 
     public void saveStudentsFromExcel(MultipartFile file, String adminEmail) throws IOException {
         // Validate admin existence
@@ -79,4 +86,14 @@ public class StudentService {
                 return "";
         }
     }
+
+    public List<Quiz> getallquiz(String studentEmail, String studentID) {
+
+        Student s = studentRepo.findByEmailAndStudentID(studentEmail, studentID);
+        String ss = s.getSem();
+        int sem = Integer.parseInt(ss);
+        List<Quiz> ans = quizRepo.findbyquery(sem);
+        return ans;
+    }
+
 }

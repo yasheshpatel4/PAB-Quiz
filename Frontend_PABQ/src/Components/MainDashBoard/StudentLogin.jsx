@@ -1,178 +1,117 @@
-import  { useState } from 'react';
-import { Lock, Mail, School, User } from 'lucide-react';
-import EnterNavbar from '../NavBar/EnterNavbar';
+import { } from 'react'
+import EnterNavbar from '../NavBar/EnterNavbar'
+import { useState } from 'react'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 
 const StudentLogin = () => {
-    const [activeTab, setActiveTab] = useState('student');
-    const [userMode, setUserMode] = useState('login');
-    const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-        confirmPassword: '',
-        collegeId: '',
-        name: ''
-    });
+  return (
+      <>
+          <EnterNavbar>
+              <Login/>
+          </EnterNavbar>
+      </>
+  )
+}
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
-    };
+export default StudentLogin
+
+const Login = () => {
+    const [email, setEmail] = useState("");
+    const [studentId, setStudentId] = useState("");
+    const [message, setMessage] = useState("");
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@ddu\.ac\.in$/;
+    const navigate = useNavigate();
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (activeTab === 'user' && userMode === 'signup' &&
-            formData.password !== formData.confirmPassword) {
-            alert("Passwords do not match!");
+
+        if (!emailRegex.test(email)) {
+            setMessage("Please enter a valid email");
             return;
         }
-        console.log(formData);
+
+        const data = {
+            email: email,
+            studentID: studentId,
+        };
+
+        setMessage("");
+
+        // Login logic
+        axios
+            .post("http://localhost:8080/auth/student/login", data)
+            .then((response) => {
+                alert(response.data);
+                localStorage.setItem("studentEmail", email);
+                localStorage.setItem("studentID", studentId);
+                navigate("/student"); // Redirect to student dashboard
+                setEmail("");
+                setStudentId("");
+            })
+            .catch((error) => {
+                setMessage("Error: " + (error.response?.data || "Login failed"));
+            });
     };
 
     return (
-        <>
-        <EnterNavbar>
-        <div className="min-h-screen  flex items-center justify-center px-4">
-            <div className="w-full max-w-md bg-white shadow-2xl rounded-2xl overflow-hidden">
-                <div className="flex">
-                    <button
-                        onClick={() => {
-                            setActiveTab('student');
-                            setUserMode('login');
-                        }}
-                        className={`w-1/2 py-4 text-lg font-semibold transition-colors ${activeTab === 'student'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                            }`}
-                    >
-                        Student
-                    </button>
-                    <button
-                        onClick={() => {
-                            setActiveTab('user');
-                            setUserMode('login');
-                        }}
-                        className={`w-1/2 py-4 text-lg font-semibold transition-colors ${activeTab === 'user'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                            }`}
-                    >
-                        User
-                    </button>
-                </div>
+        <div className="flex justify-center items-center min-h-screen">
+            <div className="bg-white p-10 rounded-2xl shadow-2xl w-96 transform transition-all duration-300 hover:scale-105">
+                <h2 className="text-3xl font-extrabold text-center mb-6 text-gray-800">
+                    Student Login
+                </h2>
 
-                {activeTab === 'user' && (
-                    <div className="flex">
-                        <button
-                            onClick={() => setUserMode('login')}
-                            className={`w-1/2 py-3 text-md transition-colors ${userMode === 'login'
-                                    ? 'bg-indigo-100 text-indigo-700'
-                                    : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
-                                }`}
+                <form onSubmit={handleSubmit}>
+                    <div className="mb-4">
+                        <label
+                            htmlFor="email"
+                            className="block text-sm font-semibold text-gray-700"
                         >
-                            Login
-                        </button>
-                        <button
-                            onClick={() => setUserMode('signup')}
-                            className={`w-1/2 py-3 text-md transition-colors ${userMode === 'signup'
-                                    ? 'bg-indigo-100 text-indigo-700'
-                                    : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
-                                }`}
-                        >
-                            Signup
-                        </button>
-                    </div>
-                )}
-
-                <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                    {activeTab === 'user' && userMode === 'signup' && (
-                        <div className="relative">
-                            <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                            <input
-                                type="text"
-                                name="name"
-                                placeholder="Full Name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required
-                            />
-                        </div>
-                    )}
-
-                    <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                            Email Address
+                        </label>
                         <input
                             type="email"
+                            id="email"
                             name="email"
-                            placeholder="Email Address"
-                            value={formData.email}
-                            onChange={handleChange}
-                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             required
+                            className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition duration-300"
                         />
                     </div>
 
-                    {activeTab === 'student' && (
-                        <div className="relative">
-                            <School className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                            <input
-                                type="text"
-                                name="collegeId"
-                                placeholder="College ID"
-                                value={formData.collegeId}
-                                onChange={handleChange}
-                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required
-                            />
-                        </div>
-                    )}
-
-                    <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <div className="mb-4">
+                        <label
+                            htmlFor="studentId"
+                            className="block text-sm font-semibold text-gray-700"
+                        >
+                            Student ID
+                        </label>
                         <input
-                            type="password"
-                            name="password"
-                            placeholder="Password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            type="text"
+                            id="studentId"
+                            name="studentId"
+                            value={studentId}
+                            onChange={(e) => setStudentId(e.target.value)}
                             required
+                            className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition duration-300"
                         />
                     </div>
 
-                    {activeTab === 'user' && userMode === 'signup' && (
-                        <div className="relative">
-                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                            <input
-                                type="password"
-                                name="confirmPassword"
-                                placeholder="Confirm Password"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required
-                            />
+                    {message && (
+                        <div className="mb-4 text-center text-red-600 font-medium">
+                            {message}
                         </div>
                     )}
 
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                        className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg shadow-md hover:shadow-lg transform transition-all duration-300 hover:scale-105"
                     >
-                        {activeTab === 'student' ? 'Student Login' :
-                            userMode === 'login' ? 'User Login' :
-                                'Sign Up'}
+                        Log In
                     </button>
-
                 </form>
             </div>
-            </div>
-            </EnterNavbar>
-        </>
+        </div>
     );
 };
-
-export default StudentLogin;

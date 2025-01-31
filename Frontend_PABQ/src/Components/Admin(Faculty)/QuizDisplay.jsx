@@ -1,63 +1,88 @@
-import { useState, useEffect } from "react"
-import axios from "axios"
-import AdminNavbar from "../NavBar/AdminNavbar"
-import { AlertCircle, LoaderCircle, Trash2, PlusCircle, Upload } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react";
+import axios from "axios";
+import AdminNavbar from "../NavBar/AdminNavbar";
+import { AlertCircle, LoaderCircle, Trash2, PlusCircle, Upload } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const QuizDisplay = () => {
-  const [quiz, setQuiz] = useState([])
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(true)
-
-  const noofquestion = localStorage.getItem("question")
+  const [quiz, setQuiz] = useState([]);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [questionCounts, setQuestionCounts] = useState({});
 
   const navigate = useNavigate();
 
+  
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/auth/admin/getallquiz")
-        const quizdata = Array.isArray(response.data) ? response.data : []
-        setQuiz(quizdata)
-      } catch (err) {
-        console.error("Error fetching quizzes:", err)
-        setError("Failed to fetch quizzes. Please try again later.")
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchQuiz()
-  }, [])
+        const response = await axios.get("http://localhost:8080/auth/admin/getallquiz", {
+          params: { email: localStorage.getItem("adminEmail") }, 
+        });
+        const quizdata = Array.isArray(response.data) ? response.data : [];
 
-  const handleUpdate = (id) => {
-    alert(`Update functionality for quiz ID: ${ id }`)
-  }
+        const counts = {};
+        await Promise.all(
+          quizdata.map(async (quiz) => {
+            try {
+              const countResponse = await axios.get(`http://localhost:8080/auth/admin/noofquestion/${quiz.quizid}`);
+              counts[quiz.quizid] = countResponse.data;
+            } catch (err) {
+              console.error(`Error fetching question count for quiz ID ${quiz.quizid}:`, err);
+              counts[quiz.quizid] = 0; 
+            }
+          })
+        );
+
+        setQuestionCounts(counts);
+        setQuiz(quizdata);
+      } catch (err) {
+        console.error("Error fetching quizzes:", err);
+        setError("Failed to fetch quizzes. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuiz();
+  }, []);
+
+
 
   const handleAddQuestion = (id) => {
     localStorage.setItem("quizid", id);
-    navigate('/admin/addquestion')
-};
+    navigate("/admin/addquestion");
+  };
 
+  const handleUpload = async (id) => {
+   
+    try {
+      const confirmUpload = window.confirm("Are you sure you want to upload the quiz?");
 
-  const handleUpload = (id) => {
-    alert(`Upload functionality for quiz ID: ${ id }`)
-  }
+      if (confirmUpload) {
+        const response = await axios.post(`http://localhost:8080/auth/admin/upload/${id}`);
+        alert(response.data);
+      }
+    } catch (err) {
+      console.error("Error uploading quiz:", err.response?.data || err.message);
+      setError(err.response?.data || "Failed to upload quiz. Please try again.");
+    }
 
+  };
 
   const handleDelete = async (id) => {
-
-    const confirmed = window.confirm("Are you sure you want to delete this quiz?")
-    if (!confirmed) return
+    const confirmed = window.confirm("Are you sure you want to delete this quiz?");
+    if (!confirmed) return;
 
     try {
-      await axios.delete(`http://localhost:8080/auth/admin/deletequiz/${id}`)
-        setQuiz(quiz.filter((quiz) => quiz.Quizid !== id))
-      alert("Quiz deleted successfully.")
+      await axios.delete(`http://localhost:8080/auth/admin/deletequiz/${id}`);
+      setQuiz(quiz.filter((quiz) => quiz.quizid !== id));
+      alert("Quiz deleted successfully.");
     } catch (err) {
-      console.error("Error deleting quiz:", err.response?.data || err.message)
-      setError(err.response?.data || "Failed to delete quiz. Please try again.")
+      console.error("Error deleting quiz:", err.response?.data || err.message);
+      setError(err.response?.data || "Failed to delete quiz. Please try again.");
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -67,7 +92,7 @@ const QuizDisplay = () => {
           <p className="text-gray-600 font-medium">Loading quizzes...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -87,7 +112,7 @@ const QuizDisplay = () => {
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   if (!Array.isArray(quiz) || quiz.length === 0) {
@@ -95,7 +120,7 @@ const QuizDisplay = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <p className="text-xl text-gray-600 font-medium">No quizzes found.</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -104,14 +129,16 @@ const QuizDisplay = () => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              {["Quiz ID", "Subject", "Semester", "Duration", "Description", "Actions","noofquestion"].map((header) => (
-                <th
-                  key={header}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  {header}
-                </th>
-              ))}
+              {["Quiz ID", "Subject", "Semester", "Duration", "Description", "NOF","available", "Actions"].map(
+                (header) => (
+                  <th
+                    key={header}
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    {header}
+                  </th>
+                )
+              )}
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -123,6 +150,10 @@ const QuizDisplay = () => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.QuizDuration}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.QuizDescription}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {questionCounts[item.quizid] || 0}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.isAvailable === true ? "yes" : "no"}</td> 
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleAddQuestion(item.quizid)}
@@ -131,14 +162,15 @@ const QuizDisplay = () => {
                     >
                       <PlusCircle className="w-4 h-4" />
                     </button>
-
                     <button
                       onClick={() => handleUpload(item.quizid)}
-                      className="p-1 text-blue-600 hover:text-blue-800 transition-colors duration-200"
+                      className={`p-1 transition-colors duration-200 rounded-full ${(questionCounts[item.quizid] || 0) >= 5
+                          ? "text-blue-600 hover:text-blue-800"
+                          : "text-gray-300 cursor-not-allowed hover:ring-2 hover:ring-red-500 hover:ring-opacity-75"
+                        }`}
                       title="Upload"
-                      disabled={noofquestion.length == 0}
+                      disabled={(questionCounts[item.quizid] || 0) < 5}
                     >
-                    
                       <Upload className="w-4 h-4" />
                     </button>
                     <button
@@ -150,13 +182,14 @@ const QuizDisplay = () => {
                     </button>
                   </div>
                 </td>
+
               </tr>
             ))}
           </tbody>
         </table>
       </div>
     </AdminNavbar>
-  )
-}
+  );
+};
 
-export default QuizDisplay
+export default QuizDisplay;

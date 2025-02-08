@@ -12,5 +12,4 @@ import java.util.Optional;
 public interface QuestionRepo extends JpaRepository<Question, Integer> {
 
     List<Question> findByQuiz(Quiz quiz);
-
 }

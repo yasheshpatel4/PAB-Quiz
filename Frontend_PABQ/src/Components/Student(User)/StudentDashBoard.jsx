@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import StudentNavbar from "../NavBar/StudentNavbar";
+import QuizModal from "./QuizModal"
 
 function StudentDashBoard() {
   const [quizzes, setQuizzes] = useState([]);
   const [error, setError] = useState(null);
-
-  const handleOpen = () => {
-    
-  }
+  const [selectedQuiz, setSelectedQuiz] = useState(null);
 
   useEffect(() => {
     const fetchQuizzes = async () => {
@@ -26,20 +24,21 @@ function StudentDashBoard() {
     fetchQuizzes();
   }, []);
 
+  const handleOpenQuiz = (quiz) => {
+    setSelectedQuiz(quiz); // Open modal with selected quiz
+  };
+
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-100">
       <StudentNavbar />
       <div className="flex-1 p-8">
-        {/* Page Header */}
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold dark:text-black">📚 Available Quizzes</h1>
           <p className="text-gray-600 dark:text-gray-500 mt-2">Select a quiz and test your knowledge!</p>
         </div>
 
-        {/* Display error message */}
         {error && <p className="text-red-500 text-center">{error}</p>}
 
-        {/* Quiz List */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {quizzes.length > 0 ? (
             quizzes.map((quiz) => (
@@ -52,10 +51,11 @@ function StudentDashBoard() {
                   <p className="text-sm">🆔 Quiz ID: <span className="font-medium">{quiz.quizid}</span></p>
                   <p className="text-sm">⏳ Duration: <span className="font-medium">{quiz.QuizDuration}</span></p>
                   <p className="text-sm">📝 Description: <span className="font-medium">{quiz.QuizDescription}</span></p>
-                  
                 </div>
-                <button className="mt-4 w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 px-4 rounded-md shadow-md transition-all"
-                  onClick={handleOpen}>
+                <button
+                  className="mt-4 w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 px-4 rounded-md shadow-md transition-all"
+                  onClick={() => handleOpenQuiz(quiz)}
+                >
                   Take Quiz 🚀
                 </button>
               </div>
@@ -65,6 +65,9 @@ function StudentDashBoard() {
           )}
         </div>
       </div>
+
+      {/* Render Quiz Modal when a quiz is selected */}
+      {selectedQuiz && <QuizModal quiz={selectedQuiz} onClose={() => setSelectedQuiz(null)} />}
     </div>
   );
 }

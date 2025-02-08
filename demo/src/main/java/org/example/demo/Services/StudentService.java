@@ -2,12 +2,8 @@ package org.example.demo.Services;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.example.demo.Model.Admin;
-import org.example.demo.Model.Quiz;
-import org.example.demo.Model.Student;
-import org.example.demo.Repo.QuizRepository;
-import org.example.demo.Repo.Repoadmin;
-import org.example.demo.Repo.StudentRepo;
+import org.example.demo.Model.*;
+import org.example.demo.Repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class StudentService {
@@ -32,6 +25,12 @@ public class StudentService {
 
     @Autowired
     private QuizRepository quizRepo;
+
+    @Autowired
+    private QuestionRepo questionRepo;
+
+    @Autowired
+    private QuizSubmissionRepository quizSubmissionRepo;
 
     public void saveStudentsFromExcel(MultipartFile file, String adminEmail) throws IOException {
         // Validate admin existence
@@ -94,6 +93,40 @@ public class StudentService {
         int sem = Integer.parseInt(ss);
         List<Quiz> ans = quizRepo.findbyquery(sem);
         return ans;
+    }
+
+    public List<Question> getallquestion(int quizId) {
+        Quiz q = quizRepo.findById(quizId).get();
+        List<Question> list = questionRepo.findByQuiz(q);
+        return list;
+    }
+
+    public QuizSubmission submitQuiz(int quizId, String studentEmail, Map<Integer, String> answers, boolean tabViolation) {
+        Quiz quiz = quizRepo.findById(quizId).get();
+       Student  student = studentRepo.findByEmail(studentEmail);
+
+        int score = 0;
+
+        if (!tabViolation) {
+            for (Question question : quiz.getQuestions()) {
+                String correctAnswer = question.getAnswer();
+                String selectedAnswer = answers.get(question.getQuestionid());
+
+                if (correctAnswer != null && correctAnswer.equalsIgnoreCase(selectedAnswer)) {
+                    score += 1;
+                }
+            }
+        }
+
+        // Save submission
+        QuizSubmission submission = new QuizSubmission();
+        submission.setQuiz(quiz);
+        submission.setStudent(student);
+        submission.setAnswers(answers);
+        submission.setScore(tabViolation ? 0 : score);
+        submission.setTabViolation(tabViolation);
+
+        return quizSubmissionRepo.save(submission);
     }
 
 }

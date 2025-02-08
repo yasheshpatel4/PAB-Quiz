@@ -25,8 +25,9 @@ function Exam() {
   }, []);
 
   // Filter exams based on search input
-  const filteredExams = exams.filter((exam) =>
-    exam.QuizDescription.toLowerCase().includes(search.toLowerCase())
+  const filteredExams = exams.filter((exam) => 
+    // exam.QuizDescription.toLowerCase().includes(search.toLowerCase())
+    exam.QuizSubject.toLowerCase().includes(search.toLowerCase())
   );
 
   return (

@@ -1,30 +1,75 @@
-import StudentNavbar from "../NavBar/StudentNavbar"
+import { useEffect, useState } from "react";
+import axios from "axios";
+import StudentNavbar from "../NavBar/StudentNavbar";
+import QuizModal from "./QuizModal"
 
 function StudentDashBoard() {
+  const [quizzes, setQuizzes] = useState([]);
+  const [error, setError] = useState(null);
+  const [selectedQuiz, setSelectedQuiz] = useState(null);
+
+  useEffect(() => {
+    const fetchQuizzes = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/api/students/allquiz", {
+          params: { studentEmail: localStorage.getItem("studentEmail"), studentID: localStorage.getItem("studentID") }
+        });
+        setQuizzes(response.data);
+      } catch (err) {
+        setError("Failed to fetch quizzes.");
+        console.error("Error fetching quizzes:", err);
+      }
+    };
+
+    fetchQuizzes();
+  }, []);
+
+  const handleOpenQuiz = (quiz) => {
+    setSelectedQuiz(quiz); // Open modal with selected quiz
+  };
+
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gradient-to-br from-gray-100">
       <StudentNavbar />
       <div className="flex-1 p-8">
-        <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-gray-800">All exams</h1>
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold dark:text-black">📚 Available Quizzes</h1>
+          <p className="text-gray-600 dark:text-gray-500 mt-2">Select a quiz and test your knowledge!</p>
         </div>
 
-        {/* Knowledge Card */}
-        <div className="bg-emerald-500 text-white rounded-lg p-6 max-w-md hover:shadow-lg transition-shadow">
-          <h2 className="text-2xl font-bold mb-2">Knowledge</h2>
-          <div className="space-y-2">
-            <p className="text-sm opacity-90">Exam date: 2023-12-30</p>
-            <div className="flex items-center mt-4">
-              <svg className="w-6 h-6 opacity-75" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-            </div>
-          </div>
+        {error && <p className="text-red-500 text-center">{error}</p>}
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {quizzes.length > 0 ? (
+            quizzes.map((quiz) => (
+              <div
+                key={quiz.quizid}
+                className="bg-white bg-opacity-80 dark:bg-opacity-90 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:scale-105 transition-transform duration-300 ease-in-out"
+              >
+                <h2 className="text-xl font-bold text-gray-900 dark:text-black mb-2">{quiz.QuizSubject}</h2>
+                <div className="space-y-2 text-gray-600 dark:text-gray-500">
+                  <p className="text-sm">🆔 Quiz ID: <span className="font-medium">{quiz.quizid}</span></p>
+                  <p className="text-sm">⏳ Duration: <span className="font-medium">{quiz.QuizDuration}</span></p>
+                  <p className="text-sm">📝 Description: <span className="font-medium">{quiz.QuizDescription}</span></p>
+                </div>
+                <button
+                  className="mt-4 w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 px-4 rounded-md shadow-md transition-all"
+                  onClick={() => handleOpenQuiz(quiz)}
+                >
+                  Take Quiz 🚀
+                </button>
+              </div>
+            ))
+          ) : (
+            <p className="text-center text-gray-600 dark:text-gray-600 col-span-full">No quizzes available.</p>
+          )}
         </div>
       </div>
+
+      {/* Render Quiz Modal when a quiz is selected */}
+      {selectedQuiz && <QuizModal quiz={selectedQuiz} onClose={() => setSelectedQuiz(null)} />}
     </div>
-  )
+  );
 }
 
-export default StudentDashBoard
-
+export default StudentDashBoard;

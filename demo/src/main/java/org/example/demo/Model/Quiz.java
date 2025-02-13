@@ -29,6 +29,9 @@ public class Quiz {
     @JsonProperty("QuizDescription")
     private String QuizDescription;
 
+    @JoinColumn(name = "available")
+    private boolean isAvailable = false;
+
     @ManyToOne
     @JoinColumn(name = "admin_email")
     @JsonBackReference
@@ -94,4 +97,11 @@ public class Quiz {
     @JsonManagedReference
     private List<Question> questions;
 
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    public void setAvailable(boolean available) {
+        isAvailable = available;
+    }
 }

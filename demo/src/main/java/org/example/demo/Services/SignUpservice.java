@@ -1,5 +1,7 @@
 package org.example.demo.Services;
 
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.example.demo.Model.Admin;
 import org.example.demo.Model.Question;
 import org.example.demo.Model.Quiz;
@@ -11,7 +13,12 @@ import org.example.demo.Repo.StudentRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -105,14 +112,14 @@ public class SignUpservice {
         return "Quiz added successfully!";
     }
 
-    public int getTotalQuiz() {
-        long ans = quizRepository.count();
+    public int getTotalQuiz(String email) {
+        long ans = quizRepository.countByAdminEmail(email);
         int total = (int) ans;
         return total;
     }
 
-    public ResponseEntity<List<Quiz>> getAllQuiz() {
-        List<Quiz> quizzes = quizRepository.findAll();
+    public ResponseEntity<List<Quiz>> getAllQuiz(String email) {
+        List<Quiz> quizzes = quizRepository.findQuizzesByAdminEmail(email);
         if (quizzes.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -165,4 +172,83 @@ public class SignUpservice {
         return questions.size();
     }
 
+    public Optional<Student> loginStudent(String email, String studentID) {
+        Student student = studentRepository.findByEmailAndStudentID(email, studentID);
+        if (student == null) {
+            return Optional.empty();
+        }
+        return Optional.of(student);
+    }
+
+    public String uploadquiz(int quizid) {
+        Quiz q = quizRepository.findById(quizid).get();
+        q.setAvailable(true);
+        quizRepository.save(q);
+        return "upload successfully!";
+    }
+
+    public void saveQuestionToExcel(MultipartFile file, int quizid) throws IOException {
+
+        Quiz quiz = quizRepository.findById(quizid).get();
+
+        List<Question> questions = parseExcelFile(file, quiz);
+        questionRepository.saveAll(questions);
+    }
+
+    private List<Question> parseExcelFile(MultipartFile file, Quiz quiz) throws IOException {
+        List<Question> questions = new ArrayList<>();
+
+        try (InputStream is = file.getInputStream();
+             Workbook workbook = new XSSFWorkbook(is)) {
+            Sheet sheet = workbook.getSheetAt(0);
+            Iterator<Row> rows = sheet.iterator();
+
+            int rowNumber = 0;
+            while (rows.hasNext()) {
+                Row currentRow = rows.next();
+                if (rowNumber == 0) { // Skip header row
+                    rowNumber++;
+                    continue;
+                }
+
+                Question question = new Question();
+                question.setQuestion(getCellValueAsString(currentRow.getCell(0)));
+                question.setAnswer(getCellValueAsString(currentRow.getCell(1)));
+                question.setOption1(getCellValueAsString(currentRow.getCell(2)));
+                question.setOption2(getCellValueAsString(currentRow.getCell(3)));
+                question.setOption3(getCellValueAsString(currentRow.getCell(4)));
+                question.setOption4(getCellValueAsString(currentRow.getCell(5)));
+                question.setQuiz(quiz);
+
+                questions.add(question);
+            }
+        }
+
+        return questions;
+    }
+
+    private String getCellValueAsString(Cell cell) {
+        if (cell == null) {
+            return "";
+        }
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue().trim();
+            case NUMERIC:
+                return String.valueOf((int) cell.getNumericCellValue());
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+            default:
+                return "";
+        }
+    }
+
+    public boolean deletequestion(int questionid) {
+        Question question = questionRepository.findById(questionid).get();
+        if (question.getQuiz() == null) {
+            return false;
+        }
+        questionRepository.delete(question);
+        return true;
+    }
 }

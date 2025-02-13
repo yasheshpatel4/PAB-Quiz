@@ -18,6 +18,8 @@ function LogOut() {
             // Clear localStorage after successful logout
             localStorage.removeItem('token');
             localStorage.removeItem("adminEmail");
+            localStorage.removeItem("question");
+            localStorage.removeItem("quizid");
 
             // Redirect to login page after successful logout
             navigate('/adminlogin');

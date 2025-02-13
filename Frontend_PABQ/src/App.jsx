@@ -15,6 +15,7 @@ import StudentLogin from "./Components/MainDashBoard/StudentLogin";
 import Quiz from "./Components/Admin(Faculty)/Quiz";
 import PerformancePage from "./Components/Admin(Faculty)/PerformancePage";
 import AddQuestionPage from "./Components/Admin(Faculty)/AddQuestionPage";
+import QuestionUpload from "./Components/Admin(Faculty)/QuestionUpload";
 
 const App = () => {
   return (
@@ -27,7 +28,8 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               {/* <Route path="manage-exam" element={<ManageExam />} /> */}
-              <Route path="addquestion" element={ <AddQuestionPage/>}/>
+              <Route path="addquestion" element={<AddQuestionPage />} />
+              <Route path="/addquestion/uploadquestion" element={<QuestionUpload />} />
               <Route path="performance" element={<Performance />} />
               <Route path="performance/:id" element={<PerformancePage/>} />
               <Route path="students" element={<Students />} />

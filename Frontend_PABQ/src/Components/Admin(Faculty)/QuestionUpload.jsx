@@ -29,30 +29,27 @@ function QuestionUpload() {
         setMessage("");
 
         const formData = new FormData();
-        formData.append("file", file);
-        formData.append("quizId", localStorage.getItem("quizid"));
+        formData.append("file", file); // Ensure this matches @RequestParam("file")
 
         try {
-            const response = await axios.post(`http://localhost:8080/auth/admin/uploadquestion/${quizId}`, {
-                method: "POST",
-                body: formData,
-            });
-
-            if (response.ok) {
-                setMessage("File uploaded successfully");
-                setStatus("success");
-            } else {
-                const errorText = await response.text();
-                setMessage(`Error uploading file: ${errorText}`);
-                setStatus("error");
-            }
+            const response = await axios.post(
+                `http://localhost:8080/auth/admin/uploadquestion/${localStorage.getItem("quizid")}`,
+                formData,
+                {
+                    headers: { "Content-Type": "multipart/form-data" },
+                }
+            );
+            setMessage(response.data)
+            setStatus("success");
         } catch (error) {
-            setMessage("Error uploading file");
+            console.error("Error uploading file:", error);
+            setMessage(`Error uploading file: ${error.response?.data || error.message}`);
             setStatus("error");
         } finally {
             setUploading(false);
         }
     };
+
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4">

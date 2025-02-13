@@ -17,10 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SignUpservice {
@@ -189,13 +187,23 @@ public class SignUpservice {
 
     public void saveQuestionToExcel(MultipartFile file, int quizid) throws IOException {
 
-        Quiz quiz = quizRepository.findById(quizid).get();
+        Quiz quiz = quizRepository.findById(quizid).orElseThrow(() -> new RuntimeException("Quiz not found"));
 
-        List<Question> questions = parseExcelFile(file, quiz);
-        questionRepository.saveAll(questions);
+        // Fetch existing questions for this quiz
+        List<Question> existingQuestions = questionRepository.findByQuizId(quizid);
+        Set<String> existingQuestionTexts = existingQuestions.stream()
+                .map(Question::getQuestion)
+                .collect(Collectors.toSet());
+
+        // Parse Excel file and filter out duplicate questions
+        List<Question> newQuestions = parseExcelFile(file, quiz, existingQuestionTexts);
+
+        if (!newQuestions.isEmpty()) {
+            questionRepository.saveAll(newQuestions);
+        }
     }
 
-    private List<Question> parseExcelFile(MultipartFile file, Quiz quiz) throws IOException {
+    private List<Question> parseExcelFile(MultipartFile file, Quiz quiz, Set<String> existingQuestionTexts) throws IOException {
         List<Question> questions = new ArrayList<>();
 
         try (InputStream is = file.getInputStream();
@@ -211,8 +219,15 @@ public class SignUpservice {
                     continue;
                 }
 
+                String questionText = getCellValueAsString(currentRow.getCell(0));
+
+                // Check if the question already exists
+                if (existingQuestionTexts.contains(questionText)) {
+                    continue; // Skip duplicate question
+                }
+
                 Question question = new Question();
-                question.setQuestion(getCellValueAsString(currentRow.getCell(0)));
+                question.setQuestion(questionText);
                 question.setAnswer(getCellValueAsString(currentRow.getCell(1)));
                 question.setOption1(getCellValueAsString(currentRow.getCell(2)));
                 question.setOption2(getCellValueAsString(currentRow.getCell(3)));
@@ -251,4 +266,5 @@ public class SignUpservice {
         questionRepository.delete(question);
         return true;
     }
+
 }

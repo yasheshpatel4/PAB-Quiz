@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { alert } from "@nextui-org/react";
 
 function QuizModal({ quiz, onClose }) {
     const [questions, setQuestions] = useState([]);
@@ -18,7 +17,6 @@ function QuizModal({ quiz, onClose }) {
         if (agreed) {
             fetchQuestions();
             enterFullScreen();
-            handleTabSwitch();
         }
     }, [agreed]);
 
@@ -27,9 +25,24 @@ function QuizModal({ quiz, onClose }) {
             const interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
             return () => clearInterval(interval);
         } else if (timer === 0) {
-            submitQuiz();
+            submitQuiz(false);
         }
     }, [timer, agreed]);
+
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.hidden) {
+                setTabSwitch(true);
+                window.alert("⚠️ Tab switching detected! Quiz auto-submitted.");
+                submitQuiz(true);
+            }
+        };
+
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+        return () => {
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
+        };
+    }, []);
 
     const fetchQuestions = async () => {
         try {
@@ -37,10 +50,9 @@ function QuizModal({ quiz, onClose }) {
                 params: { quizId: quiz.quizid },
             });
 
-            // Transform backend response to include options as an array
             const formattedQuestions = response.data.map(q => ({
                 ...q,
-                options: [q.option1, q.option2, q.option3, q.option4]
+                options: [q.option1, q.option2, q.option3, q.option4],
             }));
 
             setQuestions(formattedQuestions);
@@ -49,34 +61,27 @@ function QuizModal({ quiz, onClose }) {
         }
     };
 
-
     const enterFullScreen = () => {
-        document.documentElement.requestFullscreen();
-        document.addEventListener("keydown", (e) => {
-            if (e.key === "Escape") e.preventDefault();
-        });
-    };
+        if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen().catch(err => {
+                console.error("Error entering fullscreen mode:", err);
+            });
 
-    const handleTabSwitch = () => {
-        document.addEventListener("visibilitychange", () => {
-            if (document.hidden && questions.length > 0) { // Ensure questions are loaded
-                setTabSwitch(true);
-                submitQuiz(true);
-            }
-        });
-    };
+            const preventEscape = (e) => {
+                if (e.key === "Escape") e.preventDefault();
+            };
 
+            document.addEventListener("keydown", preventEscape);
+
+            return () => {
+                document.removeEventListener("keydown", preventEscape);
+            };
+        }
+    };
 
     const handleAnswer = (questionId, option) => {
         const updatedAnswers = { ...answers, [questionId]: option };
         setAnswers(updatedAnswers);
-
-        // Check if answer is correct and update score
-        const question = questions.find(q => q.questionid === questionId);
-
-        if (question && question.correctAnswer === option) {
-            setScore(prev => prev + question.marks);
-        }
     };
 
     const handleNavigation = (index) => {
@@ -85,32 +90,34 @@ function QuizModal({ quiz, onClose }) {
         }
     };
 
+    const submitQuiz = async (tabViolation) => {
+        const studentEmail = localStorage.getItem("studentEmail");
 
-    const submitQuiz = async (tabViolation = false) => {
-        if (!tabViolation && Object.keys(answers).length !== questions.length) {
-            alert("Please attempt all questions before submitting.");
+        if (!studentEmail) {
+            console.error("Error: Student email is missing.");
             return;
         }
 
+         // Only send answers in body
+
+        // console.log("Submitting Quiz:", { quizId: quiz.quizid, studentEmail, tabViolation, answers }); // Debugging
+
         try {
-            await axios.post("http://localhost:8080/api/students/submitQuiz",
-                answers,  // answers as JSON body
+            const response = await axios.post(
+                `http://localhost:8080/api/students/submitQuiz`,
+                answers,
                 {
-                    params: {
-                        quizId: quiz.quizid,
-                        studentEmail: localStorage.getItem("studentEmail"),
-                        tabViolation: tabViolation
-                    }
+                    params: { quizId: quiz.quizid, studentEmail, tabViolation }
                 }
             );
 
-            document.exitFullscreen();
-            window.alert("quiz submit sucessfully")
-            navigate("/student/exam"); // Redirect to dashboard
+            window.alert(response.data);
+            navigate("/student/exam");
         } catch (err) {
-            console.error("Error submitting quiz:", err);
+            console.error("Error submitting quiz:", err.response ? err.response.data : err.message);
         }
     };
+
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
@@ -127,17 +134,15 @@ function QuizModal({ quiz, onClose }) {
                 ) : (
                     <>
                         <h2 className="text-xl font-bold">{quiz.QuizSubject}</h2>
-                            <p className="text-sm text-gray-600">
-                                ⏳ Time Left: {String(Math.floor(timer / 60)).padStart(2, '0')}:
-                                {String(timer % 60).padStart(2, '0')}
-                            </p>
+                        <p className="text-sm text-gray-600">
+                            ⏳ Time Left: {String(Math.floor(timer / 60)).padStart(2, '0')}:
+                            {String(timer % 60).padStart(2, '0')}
+                        </p>
 
-                        
                         {tabSwitch && <p className="text-red-500">⚠️ Tab switching detected! Quiz auto-submitted.</p>}
-                        
+
                         {questions.length > 0 ? (
                             <div className="mt-4">
-                                {/* Question Grid for Quick Navigation */}
                                 <div className="grid grid-cols-5 gap-2 mb-4">
                                     {questions.map((q, index) => (
                                         <button
@@ -150,10 +155,9 @@ function QuizModal({ quiz, onClose }) {
                                     ))}
                                 </div>
 
-                                {/* Current Question */}
-                                <p className="font-semibold">{questions[currentIndex].question}</p>
+                                <p className="font-semibold">{questions[currentIndex]?.question}</p>
                                 <div className="mt-2 space-y-2">
-                                    {questions[currentIndex].options.map((option, idx) => (
+                                    {questions[currentIndex]?.options.map((option, idx) => (
                                         <button
                                             key={idx}
                                             className={`block w-full px-4 py-2 border rounded ${answers[questions[currentIndex].questionid] === option ? "bg-green-300" : "bg-gray-100"}`}
@@ -164,13 +168,11 @@ function QuizModal({ quiz, onClose }) {
                                     ))}
                                 </div>
 
-                                {/* Navigation Buttons */}
                                 <div className="mt-4 flex justify-between">
                                     <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={() => handleNavigation(currentIndex - 1)} disabled={currentIndex === 0}>⬅ Prev</button>
                                     <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={() => handleNavigation(currentIndex + 1)} disabled={currentIndex === questions.length - 1}>Next ➡</button>
                                 </div>
 
-                                {/* Submit Button */}
                                 {Object.keys(answers).length === questions.length && (
                                     <button className="mt-4 bg-emerald-500 text-white px-4 py-2 rounded w-full" onClick={() => submitQuiz(false)}>Submit ✅</button>
                                 )}

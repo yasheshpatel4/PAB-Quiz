@@ -80,5 +80,4 @@ public class Admin {
         this.quizzes = quizzes;
     }
 
-
 }

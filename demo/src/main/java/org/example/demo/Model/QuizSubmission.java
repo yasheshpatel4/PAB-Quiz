@@ -21,7 +21,7 @@ public class QuizSubmission {
     private Quiz quiz;
 
     @ManyToOne
-    @JoinColumn(name = "student_email", nullable = false)
+    @JoinColumn(name = "studentID", nullable = false)
     private Student student;
 
     @ElementCollection

@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/students")
@@ -64,18 +65,13 @@ public class StudentController {
     }
 
     @PostMapping("/submitQuiz")
-    public ResponseEntity<String> submitQuiz(
-            @RequestParam int quizId,
-            @RequestParam String studentEmail,
-            @RequestBody Map<Integer, String> answers,
-            @RequestParam boolean tabViolation) {
-
-        if (tabViolation) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Tab violation detected. Quiz submission rejected.");
-        }
-
-        QuizSubmission submission = studentService.submitQuiz(quizId, studentEmail, answers, tabViolation);
-        return ResponseEntity.ok("Quiz submitted successfully!");
+    public ResponseEntity<String> submitQuiz(@RequestParam int quizId,
+                                             @RequestParam String studentEmail,
+                                             @RequestBody Map<Integer,String> answers,
+                                             @RequestParam Boolean tabViolation
+                                             ) {
+        studentService.submitQuiz(quizId,studentEmail,answers,tabViolation);
+        return ResponseEntity.ok("Quiz submitted successfully");
     }
 
 }

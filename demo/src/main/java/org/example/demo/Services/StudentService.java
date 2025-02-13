@@ -101,32 +101,61 @@ public class StudentService {
         return list;
     }
 
-    public QuizSubmission submitQuiz(int quizId, String studentEmail, Map<Integer, String> answers, boolean tabViolation) {
-        Quiz quiz = quizRepo.findById(quizId).get();
-       Student  student = studentRepo.findByEmail(studentEmail);
+    public ResponseEntity<?> submitQuiz(int quizId, String studentEmail, Map<Integer, String> answers, boolean tabViolation) {
+        Quiz quiz = quizRepo.findById(quizId)
+                .orElse(null);
 
+        if (quiz == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Quiz not found with ID: " + quizId));
+        }
+
+        Student student = studentRepo.findByEmail(studentEmail);
+        if (student == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Student not found with email: " + studentEmail));
+        }
+
+        // Default score
         int score = 0;
 
-        if (!tabViolation) {
+        if(tabViolation) {
+            QuizSubmission quizSubmission = new QuizSubmission();
+            quizSubmission.setQuiz(quiz);
+            quizSubmission.setStudent(student);
+            quizSubmission.setScore(score);
+            quizSubmission.setTabViolation(true);
+            quizSubmissionRepo.save(quizSubmission);
+        }
+
+        if (!tabViolation) { // Only evaluate answers if no tab violation
             for (Question question : quiz.getQuestions()) {
                 String correctAnswer = question.getAnswer();
-                String selectedAnswer = answers.get(question.getQuestionid());
+                String selectedAnswer = answers.getOrDefault(question.getQuestionid(), "");
 
                 if (correctAnswer != null && correctAnswer.equalsIgnoreCase(selectedAnswer)) {
                     score += 1;
                 }
             }
+
+            // Save only if no tab violation
+            QuizSubmission submission = new QuizSubmission();
+            submission.setQuiz(quiz);
+            submission.setStudent(student);
+            submission.setAnswers(answers);
+            submission.setScore(score);
+            submission.setTabViolation(false); // Ensure it's false only when user hasn't switched tabs
+            quizSubmissionRepo.save(submission);
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "Quiz submitted successfully!",
+                    "score", score
+            ));
         }
 
-        // Save submission
-        QuizSubmission submission = new QuizSubmission();
-        submission.setQuiz(quiz);
-        submission.setStudent(student);
-        submission.setAnswers(answers);
-        submission.setScore(tabViolation ? 0 : score);
-        submission.setTabViolation(tabViolation);
-
-        return quizSubmissionRepo.save(submission);
+        // Tab violation detected, return response instead of exception
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("message", "❌ Cheating detected! Score is zero."));
     }
 
 }

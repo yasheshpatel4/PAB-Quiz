@@ -1,18 +1,18 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
-import AdminNavbar from "../NavBar/AdminNavbar";
-import { AlertCircle, LoaderCircle, Trash2, PlusCircle, Upload } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react"
+import axios from "axios"
+import AdminNavbar from "../NavBar/AdminNavbar"
+import { AlertCircle, LoaderCircle, Trash2, PlusCircle, Upload } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 
 const QuizDisplay = () => {
-  const [quiz, setQuiz] = useState([]);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [questionCounts, setQuestionCounts] = useState({});
+  const [quiz, setQuiz] = useState([])
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(true)
+
+  const noofquestion = localStorage.getItem("question")
 
   const navigate = useNavigate();
 
-  
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
@@ -42,42 +42,34 @@ const QuizDisplay = () => {
       } finally {
         setLoading(false);
       }
-    };
+    }
+    fetchQuiz()
+  }, [])
 
-    fetchQuiz();
-  }, []);
-
-
+  const handleUpdate = (id) => {
+    alert(`Update functionality for quiz ID: ${ id }`)
+  }
 
   const handleAddQuestion = (id) => {
     localStorage.setItem("quizid", id);
-    navigate("/admin/addquestion");
-  };
+    navigate('/admin/addquestion')
+};
 
-  const handleUpload = async (id) => {
-   
-    try {
-      const confirmUpload = window.confirm("Are you sure you want to upload the quiz?");
 
-      if (confirmUpload) {
-        const response = await axios.post(`http://localhost:8080/auth/admin/upload/${id}`);
-        alert(response.data);
-      }
-    } catch (err) {
-      console.error("Error uploading quiz:", err.response?.data || err.message);
-      setError(err.response?.data || "Failed to upload quiz. Please try again.");
-    }
+  const handleUpload = (id) => {
+    alert(`Upload functionality for quiz ID: ${ id }`)
+  }
 
-  };
 
   const handleDelete = async (id) => {
-    const confirmed = window.confirm("Are you sure you want to delete this quiz?");
-    if (!confirmed) return;
+
+    const confirmed = window.confirm("Are you sure you want to delete this quiz?")
+    if (!confirmed) return
 
     try {
-      await axios.delete(`http://localhost:8080/auth/admin/deletequiz/${id}`);
-      setQuiz(quiz.filter((quiz) => quiz.quizid !== id));
-      alert("Quiz deleted successfully.");
+      await axios.delete(`http://localhost:8080/auth/admin/deletequiz/${id}`)
+        setQuiz(quiz.filter((quiz) => quiz.Quizid !== id))
+      alert("Quiz deleted successfully.")
     } catch (err) {
       console.error("Error deleting quiz:", err.response?.data || err.message);
       setError(err.response?.data || "Failed to delete quiz. Please try again.");
@@ -86,10 +78,10 @@ const QuizDisplay = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="flex flex-col items-center gap-3">
-          <LoaderCircle className="w-8 h-8 text-indigo-600 animate-spin" />
-          <p className="text-gray-600 font-medium">Loading quizzes...</p>
+          <LoaderCircle className="w-10 h-10 text-indigo-600 animate-spin" />
+          <p className="text-gray-700 font-medium text-lg">Loading quizzes...</p>
         </div>
       </div>
     );
@@ -97,16 +89,16 @@ const QuizDisplay = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6 border border-red-200">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+        <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 border border-red-200">
           <div className="flex items-center gap-3 text-red-600 mb-4">
-            <AlertCircle className="w-6 h-6" />
-            <h2 className="text-lg font-semibold">Error</h2>
+            <AlertCircle className="w-8 h-8" />
+            <h2 className="text-xl font-semibold">Error</h2>
           </div>
-          <p className="text-gray-600 mb-4">{error}</p>
+          <p className="text-gray-700 mb-6 text-lg">{error}</p>
           <button
             onClick={() => setError("")}
-            className="w-full py-2 px-4 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200"
+            className="w-full py-3 px-4 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200 text-lg font-semibold"
           >
             Dismiss
           </button>
@@ -117,8 +109,8 @@ const QuizDisplay = () => {
 
   if (!Array.isArray(quiz) || quiz.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-xl text-gray-600 font-medium">No quizzes found.</p>
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <p className="text-2xl text-gray-700 font-medium">No quizzes found.</p>
       </div>
     );
   }
@@ -129,16 +121,14 @@ const QuizDisplay = () => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              {["Quiz ID", "Subject", "Semester", "Duration", "Description", "NOF","available", "Actions"].map(
-                (header) => (
-                  <th
-                    key={header}
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    {header}
-                  </th>
-                )
-              )}
+              {["Quiz ID", "Subject", "Semester", "Duration", "Description", "Actions","noofquestion"].map((header) => (
+                <th
+                  key={header}
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  {header}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -150,10 +140,6 @@ const QuizDisplay = () => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.QuizDuration}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.QuizDescription}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {questionCounts[item.quizid] || 0}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.isAvailable === true ? "yes" : "no"}</td> 
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleAddQuestion(item.quizid)}
@@ -162,15 +148,14 @@ const QuizDisplay = () => {
                     >
                       <PlusCircle className="w-4 h-4" />
                     </button>
+
                     <button
                       onClick={() => handleUpload(item.quizid)}
-                      className={`p-1 transition-colors duration-200 rounded-full ${(questionCounts[item.quizid] || 0) >= 5
-                          ? "text-blue-600 hover:text-blue-800"
-                          : "text-gray-300 cursor-not-allowed hover:ring-2 hover:ring-red-500 hover:ring-opacity-75"
-                        }`}
+                      className="p-1 text-blue-600 hover:text-blue-800 transition-colors duration-200"
                       title="Upload"
-                      disabled={(questionCounts[item.quizid] || 0) < 5}
+                      disabled={noofquestion.length == 0}
                     >
+                    
                       <Upload className="w-4 h-4" />
                     </button>
                     <button
@@ -182,7 +167,6 @@ const QuizDisplay = () => {
                     </button>
                   </div>
                 </td>
-
               </tr>
             ))}
           </tbody>
@@ -192,4 +176,4 @@ const QuizDisplay = () => {
   );
 };
 
-export default QuizDisplay;
+export default QuizDisplay

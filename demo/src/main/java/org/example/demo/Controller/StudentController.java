@@ -55,8 +55,9 @@ public class StudentController {
     }
 
     @GetMapping("/allquiz")
-    public List<Quiz> getQuizzes(@RequestParam String studentEmail, @RequestParam String studentID) {
-        return studentService.getallquiz(studentEmail,studentID);
+    public ResponseEntity<List<Quiz>> getQuizzes(@RequestParam String studentEmail, @RequestParam String studentID) {
+        List<Quiz> quizzes = studentService.getallquiz(studentEmail, studentID);
+        return ResponseEntity.ok(quizzes);
     }
 
     @GetMapping("/getquestion")
@@ -72,6 +73,12 @@ public class StudentController {
                                              ) {
         studentService.submitQuiz(quizId,studentEmail,answers,tabViolation);
         return ResponseEntity.ok("Quiz submitted successfully");
+    }
+
+    @GetMapping("/completedquiz")
+    public ResponseEntity<List<String>> completedQuiz(@RequestParam String studentEmail, @RequestParam String studentID) {
+        List<String> list =  studentService.completedquiz(studentEmail,studentID);
+        return ResponseEntity.ok(list);
     }
 
 }

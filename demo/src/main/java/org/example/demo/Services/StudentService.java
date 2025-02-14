@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentService {
@@ -88,11 +89,20 @@ public class StudentService {
 
     public List<Quiz> getallquiz(String studentEmail, String studentID) {
 
-        Student s = studentRepo.findByEmailAndStudentID(studentEmail, studentID);
-        String ss = s.getSem();
+        Student student = studentRepo.findByEmailAndStudentID(studentEmail, studentID);
+        if (student == null) {
+            throw new RuntimeException("Student not found");
+        }
+
+        String ss = student.getSem();
         int sem = Integer.parseInt(ss);
-        List<Quiz> ans = quizRepo.findbyquery(sem);
-        return ans;
+
+        List<Integer> submittedQuizIds = quizSubmissionRepo.findSubmittedQuizIds(student);
+        List<Quiz> availableQuizzes = quizRepo.findbyquery(sem).stream()
+                .filter(quiz -> !submittedQuizIds.contains(quiz.getQuizid()))
+                .collect(Collectors.toList());
+
+        return availableQuizzes;
     }
 
     public List<Question> getallquestion(int quizId) {
@@ -128,7 +138,7 @@ public class StudentService {
             quizSubmissionRepo.save(quizSubmission);
         }
 
-        if (!tabViolation) { // Only evaluate answers if no tab violation
+        if (!tabViolation) {
             for (Question question : quiz.getQuestions()) {
                 String correctAnswer = question.getAnswer();
                 String selectedAnswer = answers.getOrDefault(question.getQuestionid(), "");
@@ -138,13 +148,12 @@ public class StudentService {
                 }
             }
 
-            // Save only if no tab violation
             QuizSubmission submission = new QuizSubmission();
             submission.setQuiz(quiz);
             submission.setStudent(student);
             submission.setAnswers(answers);
             submission.setScore(score);
-            submission.setTabViolation(false); // Ensure it's false only when user hasn't switched tabs
+            submission.setTabViolation(false);
             quizSubmissionRepo.save(submission);
 
             return ResponseEntity.ok(Map.of(
@@ -152,10 +161,27 @@ public class StudentService {
                     "score", score
             ));
         }
-
-        // Tab violation detected, return response instead of exception
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(Map.of("message", "❌ Cheating detected! Score is zero."));
     }
 
+    public List<String> completedquiz(String studentEmail, String studentID) {
+
+        Student student = studentRepo.findByEmailAndStudentID(studentEmail, studentID);
+        List<String> quizDetailsList = new ArrayList<>();
+        List<Object[]> quizDetails = quizSubmissionRepo.findQuizDetailsByStudent(student);
+
+        // Format the data into a list of strings with desired format
+        for (Object[] details : quizDetails) {
+            String subject = (String) details[0];
+            String topic = (String) details[1];
+            int score = (Integer) details[2];
+            String status = "Finished";
+
+            String formattedDetails = "Subject: " + subject + ", Topic: " + topic + ", Status: " + status + ", Score: " + score;
+            quizDetailsList.add(formattedDetails);
+        }
+
+        return quizDetailsList;
+    }
 }

@@ -98,14 +98,14 @@ function QuizModal({ quiz, onClose }) {
             return;
         }
 
-         // Only send answers in body
+        const requestBody = answers; // Only send answers in body
 
-        // console.log("Submitting Quiz:", { quizId: quiz.quizid, studentEmail, tabViolation, answers }); // Debugging
+        console.log("Submitting Quiz:", { quizId: quiz.quizid, studentEmail, tabViolation, answers }); // Debugging
 
         try {
             const response = await axios.post(
                 `http://localhost:8080/api/students/submitQuiz`,
-                answers,
+                requestBody,
                 {
                     params: { quizId: quiz.quizid, studentEmail, tabViolation }
                 }

@@ -16,6 +16,7 @@ function Logout() {
             alert(response.data);
             localStorage.removeItem('token');
             localStorage.removeItem("studentEmail");
+            localStorage.removeItem("studentID")
             navigate('/studentlogin');
         } catch (error) {
             console.error('Logout failed', error);

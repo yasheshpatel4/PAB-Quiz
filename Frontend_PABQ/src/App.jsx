@@ -12,7 +12,7 @@ import StudentNavbar from "./Components/NavBar/StudentNavbar";
 import DefaultQuiz from "./Components/MainDashBoard/DefaultQuiz";
 import AdminLoginAndSignup from "./Components/MainDashBoard/AdminLoginAndSignup";
 import StudentLogin from "./Components/MainDashBoard/StudentLogin";
-import Quiz from "./Components/Admin(Faculty)/Quiz";
+// import Quiz from "./Components/Admin(Faculty)/Quiz";
 import PerformancePage from "./Components/Admin(Faculty)/PerformancePage";
 import AddQuestionPage from "./Components/Admin(Faculty)/AddQuestionPage";
 import QuestionUpload from "./Components/Admin(Faculty)/QuestionUpload";
@@ -60,7 +60,7 @@ const App = () => {
               <Route path="/" element={< DefaultQuiz />} />
               <Route path="adminlogin" element={<AdminLoginAndSignup />} />
               <Route path="studentlogin" element={<StudentLogin />} />
-              <Route path="quiz" element={<Quiz />} />
+              {/* <Route path="quiz" element={<Quiz />} /> */}
             </Routes>
           </StudentNavbar>
         }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Upload, AlertCircle, CheckCircle } from "lucide-react";
 
 function StudentUpload() {
@@ -7,9 +7,17 @@ function StudentUpload() {
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("idle");
   const [adminEmail, setAdminEmail] = useState("");
-  
+
+  // Fetch adminEmail from localStorage when the component mounts
+  useEffect(() => {
+    const storedEmail = localStorage.getItem("adminEmail");
+    if (storedEmail) {
+      setAdminEmail(storedEmail);
+    }
+  }, []);
+
   const handleFileChange = (e) => {
-    if (e.target.files) {
+    if (e.target.files.length > 0) {
       setFile(e.target.files[0]);
       setStatus("idle");
       setMessage("");
@@ -23,21 +31,27 @@ function StudentUpload() {
       return;
     }
 
+    if (!adminEmail) {
+      setMessage("Admin email is missing. Please log in again.");
+      setStatus("error");
+      return;
+    }
+
     setUploading(true);
     setMessage("");
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("adminEmail", localStorage.getItem("adminEmail"));
+    formData.append("adminEmail", adminEmail);
 
     try {
       const response = await fetch("http://localhost:8080/api/students/upload", {
         method: "POST",
-        body: formData,
+        body: formData, // No need to set `Content-Type`
       });
 
       if (response.ok) {
-        setMessage("File uploaded successfully");
+        setMessage("File uploaded successfully!");
         setStatus("success");
       } else {
         const errorText = await response.text();
@@ -45,7 +59,7 @@ function StudentUpload() {
         setStatus("error");
       }
     } catch (error) {
-      setMessage("Error uploading file");
+      setMessage("Error uploading file. Please check your connection.");
       setStatus("error");
     } finally {
       setUploading(false);
@@ -53,7 +67,7 @@ function StudentUpload() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4">
+    <div className=" min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4">
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border border-gray-100">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Student Upload</h1>
@@ -61,7 +75,6 @@ function StudentUpload() {
         </div>
 
         <div className="space-y-6">
-
           {/* File Upload Input */}
           <div className="relative">
             <input
@@ -112,9 +125,7 @@ function StudentUpload() {
           {/* Status Message */}
           {message && (
             <div
-              className={`flex items-center gap-2 p-4 rounded-lg ${status === "success"
-                ? "bg-green-50 text-green-700"
-                : "bg-red-50 text-red-700"
+              className={`flex items-center gap-2 p-4 rounded-lg ${status === "success" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
                 }`}
             >
               {status === "success" ? (

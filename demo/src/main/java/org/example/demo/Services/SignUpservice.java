@@ -1,15 +1,13 @@
 package org.example.demo.Services;
 
+import jakarta.transaction.Transactional;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.example.demo.Model.Admin;
 import org.example.demo.Model.Question;
 import org.example.demo.Model.Quiz;
 import org.example.demo.Model.Student;
-import org.example.demo.Repo.QuestionRepo;
-import org.example.demo.Repo.QuizRepository;
-import org.example.demo.Repo.Repoadmin;
-import org.example.demo.Repo.StudentRepo;
+import org.example.demo.Repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -34,6 +32,9 @@ public class SignUpservice {
 
     @Autowired
     private QuestionRepo questionRepository;
+
+    @Autowired
+    private QuizSubmissionRepository quizSubmissionRepository;
 
     public String registerAdmin(Admin admin){
 
@@ -124,9 +125,11 @@ public class SignUpservice {
         return ResponseEntity.ok(quizzes);
     }
 
+    @Transactional
     public boolean deletequiz(int id) {
         Optional<Quiz> quizOptional = quizRepository.findById(id);
         if (quizOptional.isPresent()) {
+            quizSubmissionRepository.deleteByQuizId(id);
             quizRepository.delete(quizOptional.get());
             return true;
         } else {

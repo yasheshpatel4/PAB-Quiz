@@ -8,7 +8,7 @@ import QuizDisplay from '../QuizDisplay';
 
 const Dashboard = () => {
   const [totalStudents, setTotalStudents] = useState(0);
-  const [totalQuiz,setTotalQuiz] = useState(0)
+  const [totalQuiz, setTotalQuiz] = useState(0)
   const [isStudentModalOpen, setIsStudentModalOpen] = useState(false);
   const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
   const [studentData, setStudentData] = useState([]);
@@ -130,7 +130,7 @@ const Dashboard = () => {
 
     try {
 
-      
+
       const response = await axios.post('http://localhost:8080/auth/admin/createquiz', quizForm, {
         params: { adminEmail: adminEmail },
       });
@@ -145,9 +145,9 @@ const Dashboard = () => {
 
 
   return (
-    <div className="ml-32 container mx-auto p-20">
-      <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <div className="ml-40 container p-20">
+      <h1 className="ml-8 text-3xl font-bold mb-4">Admin Dashboard</h1>
+      <div className="ml-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-8">
         <DashboardCard title="Total Students :" value={totalStudents} description="View the total number of students currently registered in the system." />
         <DashboardCard title="Add Student :" handleOpenModal={() => setIsStudentModalOpen(true)} description="Register new students to the system with their details." />
         <DashboardCard title="Create Quiz :" value={totalQuiz} handleOpenModal={() => setIsQuizModalOpen(true)} description="Set up a new quiz with title, description, and duration." />
@@ -266,8 +266,8 @@ const Dashboard = () => {
         </Modal>
       )}
 
-      <QuizDisplay/>
-      
+      <QuizDisplay />
+
     </div>
   );
 };

@@ -18,7 +18,6 @@ function Logout() {
                     },
                 },
             )
-            console.log(response.data) // Log instead of alert for better UX
             localStorage.removeItem("token")
             localStorage.removeItem("studentEmail")
             localStorage.removeItem("studentID")

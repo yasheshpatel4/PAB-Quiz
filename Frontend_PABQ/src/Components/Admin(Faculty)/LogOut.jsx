@@ -19,7 +19,6 @@ function LogOut() {
             },
           },
         )
-        console.log(response.data)
         localStorage.removeItem("token")
         localStorage.removeItem("adminEmail")
         localStorage.removeItem("question")

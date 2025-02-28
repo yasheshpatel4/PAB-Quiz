@@ -92,13 +92,13 @@ public class RequestController {
     }
 
     @GetMapping("/admin/noofstudents")
-    public int getTotalStudents() {
-        return signUpservice.gettotalstudents();
+    public int getTotalStudents(@RequestParam String email) {
+        return signUpservice.gettotalstudents(email);
     }
 
     @GetMapping("/admin/getallstudents")
-    public ResponseEntity<List<Student>> getAllStudents() {
-        return signUpservice.getAllStudent();
+    public ResponseEntity<List<Student>> getAllStudents(@RequestParam String email) {
+        return signUpservice.getAllStudent(email);
     }
 
     @DeleteMapping("/admin/deletestudent/{id}")

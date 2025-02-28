@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -27,10 +30,9 @@ public class Student {
     @Column(name = "SEM")
     private String sem;
 
-    @ManyToOne
-    @JoinColumn(name = "admin_email")
+    @ManyToMany(mappedBy = "students")
     @JsonBackReference
-    private Admin admin;
+    private List<Admin> admins = new ArrayList<>();;
 
     public String getStudentID() {
         return studentID;
@@ -72,12 +74,11 @@ public class Student {
         this.sem = sem;
     }
 
-    public Admin getAdmin() {
-        return admin;
+    public List<Admin> getAdmins() {
+        return admins;
     }
 
-    public void setAdmin(Admin admin) {
-        this.admin = admin;
+    public void setAdmins(List<Admin> admins) {
+        this.admins = admins;
     }
-
 }

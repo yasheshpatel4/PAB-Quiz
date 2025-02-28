@@ -1,5 +1,6 @@
 package org.example.demo.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -22,18 +23,19 @@ public class Admin {
     @Column(name = "admin_pass")
     private String password;
 
-    @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @ManyToMany
+    @JoinTable(name = "admin_student", joinColumns = @JoinColumn(name = "admin_email"), inverseJoinColumns = @JoinColumn(name = "student_id"))
+    @JsonIgnore
     private List<Student> students;
 
     public void addStudent(Student student) {
         students.add(student);
-        student.setAdmin(this);
+        student.getAdmins().add(this); // Maintain bidirectional reference
     }
 
     public void removeStudent(Student student) {
         students.remove(student);
-        student.setAdmin(null);
+        student.getAdmins().remove(this); // Maintain bidirectional reference
     }
 
     public String getEmail() {
@@ -79,5 +81,7 @@ public class Admin {
     public void setQuizzes(List<Quiz> quizzes) {
         this.quizzes = quizzes;
     }
+
+
 
 }

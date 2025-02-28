@@ -47,7 +47,9 @@ function Students() {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/auth/admin/getallstudents")
+        const response = await axios.get("http://localhost:8080/auth/admin/getallstudents", {
+          params: { email: localStorage.getItem("adminEmail") }
+        })
         const studentsData = Array.isArray(response.data) ? response.data : []
         setStudents(studentsData)
       } catch (err) {
@@ -101,7 +103,9 @@ function Students() {
       }
 
       // Fetch basic student data
-      const studentsResponse = await axios.get("http://localhost:8080/auth/admin/getallstudents")
+      const studentsResponse = await axios.get("http://localhost:8080/auth/admin/getallstudents", {
+        params: { email: localStorage.getItem("adminEmail") }
+      })
       const studentsData = studentsResponse.data
 
       if (!Array.isArray(studentsData) || studentsData.length === 0) {

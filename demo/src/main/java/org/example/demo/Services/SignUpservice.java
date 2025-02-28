@@ -63,32 +63,38 @@ public class SignUpservice {
             return "Error: Admin not found!";
         }
 
-        List<Student> existingStudents = studentRepository.findByEmailAndStudentIDAndRollNumber(
-                student.getEmail(), student.getStudentID(), student.getRollNumber());
-        if (!existingStudents.isEmpty()) {
-            return "Error: Student already exists!";
+        // Ensure student has a non-null list of admins
+        if (student.getAdmins() == null) {
+            student.setAdmins(new ArrayList<>());  // ✅ Initialize if null
         }
 
-        // Associate the student with the admin
-        student.setAdmin(admin);
-        studentRepository.save(student);
+        // **Save the student first**
+        student = studentRepository.save(student); // ✅ Saves student before associating
+
+        // Establish Many-to-Many relationship
+        admin.getStudents().add(student);
+        student.getAdmins().add(admin);
+
+        // Save the relationship
+        adminRepository.save(admin);
 
         return "Student added successfully!";
     }
 
-    public int gettotalstudents() {
-        long ans = studentRepository.count();
-        int total = (int) ans;
-        return total;
+    public int gettotalstudents(String adminEmail) {
+        return (int) studentRepository.countStudentsByAdminEmail(adminEmail);
     }
 
-    public ResponseEntity<List<Student>> getAllStudent() {
-        List<Student> students = studentRepository.findAll();
+    public ResponseEntity<List<Student>> getAllStudent(String adminEmail) {
+        List<Student> students = studentRepository.findStudentsByAdminEmail(adminEmail);
+
         if (students.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
+
         return ResponseEntity.ok(students);
     }
+
 
     public boolean deleteStudent(String id) {
         Optional<Student> studentOptional = studentRepository.findById(id);

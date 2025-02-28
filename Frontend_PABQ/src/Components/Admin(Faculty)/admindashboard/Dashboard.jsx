@@ -31,7 +31,9 @@ const Dashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/auth/admin/noofstudents');
+      const response = await axios.get('http://localhost:8080/auth/admin/noofstudents', {
+        params:{email:localStorage.getItem("adminEmail")}
+      });
       setTotalStudents(response.data);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);

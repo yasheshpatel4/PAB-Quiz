@@ -36,10 +36,31 @@ public class StudentService {
     public void saveStudentsFromExcel(MultipartFile file, String adminEmail) throws IOException {
         // Validate admin existence
         Admin admin = adminRepo.findByEmail(adminEmail);
+        if (admin == null) {
+            throw new RuntimeException("Admin not found!");
+        }
 
-        // Parse Excel file and associate students with the admin
+        // Parse Excel file and get students
         List<Student> students = parseExcelFile(file, admin);
+
+        // Save students before linking with Admin
         studentRepo.saveAll(students);
+
+        // Establish relationship after students are saved
+        for (Student student : students) {
+            if (student.getAdmins() == null) {
+                student.setAdmins(new ArrayList<>());
+            }
+            student.getAdmins().add(admin);
+
+            if (admin.getStudents() == null) {
+                admin.setStudents(new ArrayList<>());
+            }
+            admin.getStudents().add(student);
+        }
+
+        // Save admin to update relationship
+        adminRepo.save(admin);
     }
 
     private List<Student> parseExcelFile(MultipartFile file, Admin admin) throws IOException {
@@ -64,7 +85,7 @@ public class StudentService {
                 student.setEmail(getCellValueAsString(currentRow.getCell(2)));
                 student.setRollNumber(getCellValueAsString(currentRow.getCell(3)));
                 student.setSem(getCellValueAsString(currentRow.getCell(4)));
-                student.setAdmin(admin); // Associate student with admin
+                student.getAdmins().add(admin); // Associate student with admin
 
                 students.add(student);
             }

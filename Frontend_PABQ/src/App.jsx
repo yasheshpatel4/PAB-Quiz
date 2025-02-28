@@ -31,8 +31,8 @@ const App = () => {
               {/* <Route path="manage-exam" element={<ManageExam />} /> */}
               <Route path="addquestion" element={<AddQuestionPage />} />
               <Route path="/addquestion/uploadquestion" element={<QuestionUpload />} />
-              {/* <Route path="performance" element={<Performance />} /> */}
-              {/* <Route path="performance/:id" element={<PerformancePage/>} /> */}
+              <Route path="performance" element={<Performance />} />
+              <Route path="performance/:id" element={<PerformancePage />} />
               <Route path="students" element={<Students />} />
               <Route path="logout" element={<LogOut />} />
               <Route path="studentscore/:id/:email" element={<StudentScorePage />} />

@@ -67,8 +67,6 @@ public class RequestController {
 
     @PostMapping("/admin/addstudentdata")
     public ResponseEntity<?> addStudentData(@RequestBody List<Student> students,@RequestParam String adminEmail) {
-
-        System.out.printf("addStudentData" + students);
         List<String> errors = new ArrayList<>();
 
         if (adminEmail == null || adminEmail.isEmpty()) {

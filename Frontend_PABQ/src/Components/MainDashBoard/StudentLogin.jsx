@@ -5,13 +5,13 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 
 const StudentLogin = () => {
-  return (
-      <>
-          <EnterNavbar>
-              <Login/>
-          </EnterNavbar>
-      </>
-  )
+    return (
+        <>
+            <EnterNavbar>
+                <Login />
+            </EnterNavbar>
+        </>
+    )
 }
 
 export default StudentLogin

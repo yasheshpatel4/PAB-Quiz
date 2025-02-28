@@ -1,7 +1,7 @@
 "use client"
 
 import AdminNavbar from "../NavBar/AdminNavbar"
-import { useNavigate } from "react-router-dom"
+import { Await, useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
 import axios from "axios"
 import StudentUpload from "./StudentUpload"
@@ -60,8 +60,13 @@ function Students() {
     fetchStudents()
   }, [])
 
-  const handleUpdate = (id) => {
-    alert(`Update functionality for student ID: ${id}`)
+  const handleUpdate = async (id) => {
+    try {
+      const resposne = await axios.put("http://localhost:8080/auth/admin/updatestudent");
+      
+    } catch (err) {
+      setError(err)
+     }
   }
 
   const handleDelete = async (id) => {
@@ -73,7 +78,6 @@ function Students() {
       setStudents(students.filter((student) => student.studentID !== id))
       alert("Student deleted successfully.")
     } catch (err) {
-      console.error("Error deleting student:", err.response?.data || err.message)
       setError(err.response?.data || "Failed to delete student. Please try again.")
     }
   }
@@ -211,6 +215,17 @@ function Students() {
       return matchesSearchQuery && matchesSemesterFilter
     })
     : []
+  
+  const removeallstudent = async () => {
+    const confirmed = window.confirm("Are you sure you want to delete all student?")
+    if (!confirmed) return
+    try {
+      const response = await axios.delete("http://localhost:8080/auth/admin/removeallstudent");
+      alert(response.data);
+    } catch (err) {
+      setError(err.response?.data || "Failed to delete all student. Please try again.")
+    }
+  }
 
   const toggleUpload = () => {
     setShowUpload(!showUpload)
@@ -263,6 +278,11 @@ function Students() {
             <div className="flex justify-between items-center mb-8">
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Student Management</h1>
               <div>
+                <button onClick={removeallstudent}
+                  className="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200 mr-2"
+                >
+                  Remove All Student
+                </button>
                 <button
                   onClick={toggleUpload}
                   className="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors duration-200 mr-2"

@@ -109,7 +109,7 @@ const AddQuestionPage = () => {
 
     return (
         <AdminNavbar>
-            <div className="p-6 bg-gray-50 min-h-screen ml-20">
+            <div className="ml-64 p-6 bg-gray-50 min-h-screen">
                 <div className="flex justify-between items-center mb-6">
                     <button
                         onClick={() => {

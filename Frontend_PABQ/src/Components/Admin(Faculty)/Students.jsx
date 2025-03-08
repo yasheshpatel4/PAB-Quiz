@@ -1,12 +1,12 @@
 "use client"
 
 import AdminNavbar from "../NavBar/AdminNavbar"
-import { Await, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
 import axios from "axios"
 import StudentUpload from "./StudentUpload"
 import * as XLSX from "xlsx"
-import { Search, Upload, Trash2, Edit2, AlertCircle, LoaderCircle, Download } from "lucide-react"
+import { Search, Upload, Trash2, Edit2, AlertCircle, LoaderCircle, Download, X, Save } from 'lucide-react'
 
 function Students() {
   const [students, setStudents] = useState([])
@@ -17,6 +17,9 @@ function Students() {
   const [showUpload, setShowUpload] = useState(false)
   const [showDownloadModal, setShowDownloadModal] = useState(false)
   const [downloadSemester, setDownloadSemester] = useState("")
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editingStudent, setEditingStudent] = useState(null)
+  const [updatingStudent, setUpdatingStudent] = useState(false)
 
   // Add these state variables after other state declarations
   const [selectedColumns, setSelectedColumns] = useState({
@@ -62,13 +65,48 @@ function Students() {
     fetchStudents()
   }, [])
 
-  const handleUpdate = async (id) => {
+  const handleUpdate = (student) => {
+    setEditingStudent({...student})
+    setShowEditModal(true)
+  }
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target
+    setEditingStudent(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleSaveEdit = async () => {
+    if (!editingStudent) return
+    
+    setUpdatingStudent(true)
     try {
-      const resposne = await axios.put("http://localhost:8080/auth/admin/updatestudent");
+      const adminEmail = localStorage.getItem("adminEmail")
+      if (!adminEmail) {
+        throw new Error("Admin email not found. Please log in again.")
+      }
       
+      const response = await axios.patch(
+        `http://localhost:8080/auth/admin/updatestudent/${editingStudent.studentID}`,
+        editingStudent,
+      )
+      
+      // Update the students list with the edited student
+      setStudents(students.map(student => 
+        student.studentID === editingStudent.studentID ? editingStudent : student
+      ))
+      
+      setShowEditModal(false)
+      setEditingStudent(null)
+      alert(response.data)
     } catch (err) {
-      setError(err)
-     }
+      console.error("Error updating student:", err.response?.data || err.message)
+      setError(err.response?.data || "Failed to update student. Please try again.")
+    } finally {
+      setUpdatingStudent(false)
+    }
   }
 
   const handleDelete = async (id) => {
@@ -80,6 +118,7 @@ function Students() {
       setStudents(students.filter((student) => student.studentID !== id))
       alert("Student deleted successfully.")
     } catch (err) {
+      console.error("Error deleting student:", err.response?.data || err.message)
       setError(err.response?.data || "Failed to delete student. Please try again.")
     }
   }
@@ -103,9 +142,7 @@ function Students() {
       }
 
       // Fetch basic student data
-      const studentsResponse = await axios.get("http://localhost:8080/auth/admin/getallstudents", {
-        params: { email: localStorage.getItem("adminEmail") }
-      })
+      const studentsResponse = await axios.get("http://localhost:8080/auth/admin/getallstudents")
       const studentsData = studentsResponse.data
 
       if (!Array.isArray(studentsData) || studentsData.length === 0) {
@@ -209,27 +246,16 @@ function Students() {
 
   const filteredStudents = Array.isArray(students)
     ? students.filter((student) => {
-      const matchesSearchQuery =
-        (student.name?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
-        (student.email?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
-        (student.rollNumber?.toLowerCase() || "").includes(searchQuery.toLowerCase())
+        const matchesSearchQuery =
+          (student.name?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+          (student.email?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+          (student.rollNumber?.toLowerCase() || "").includes(searchQuery.toLowerCase())
 
-      const matchesSemesterFilter = semesterFilter ? student.sem === semesterFilter : true
+        const matchesSemesterFilter = semesterFilter ? student.sem === semesterFilter : true
 
-      return matchesSearchQuery && matchesSemesterFilter
-    })
+        return matchesSearchQuery && matchesSemesterFilter
+      })
     : []
-  
-  const removeallstudent = async () => {
-    const confirmed = window.confirm("Are you sure you want to delete all student?")
-    if (!confirmed) return
-    try {
-      const response = await axios.delete("http://localhost:8080/auth/admin/removeallstudent");
-      alert(response.data);
-    } catch (err) {
-      setError(err.response?.data || "Failed to delete all student. Please try again.")
-    }
-  }
 
   const toggleUpload = () => {
     setShowUpload(!showUpload)
@@ -282,11 +308,6 @@ function Students() {
             <div className="flex justify-between items-center mb-8">
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Student Management</h1>
               <div>
-                <button onClick={removeallstudent}
-                  className="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200 mr-2"
-                >
-                  Remove All Student
-                </button>
                 <button
                   onClick={toggleUpload}
                   className="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors duration-200 mr-2"
@@ -295,7 +316,7 @@ function Students() {
                     <>Back to List</>
                   ) : (
                     <>
-                      <Upload className="w-4 h-4" />
+                      <Upload className="w-4 h-4 mr-2" />
                       Upload Students
                     </>
                   )}
@@ -305,7 +326,7 @@ function Students() {
                   onClick={handleDownloadClick}
                   className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200"
                 >
-                  <Download className="w-4 h-4" />
+                  <Download className="w-4 h-4 mr-2" />
                   Download
                 </button>
               </div>
@@ -366,17 +387,23 @@ function Students() {
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             <div className="flex gap-2">
                               <button
-                                onClick={() => handleUpdate(student.studentID)}
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleUpdate(student)
+                                }}
                                 className="p-1 text-blue-600 hover:text-blue-800 transition-colors duration-200"
                                 title="Edit student"
                               >
                                 <Edit2 className="w-4 h-4" />
                               </button>
                               <button
-                                onClick={() => handleDelete(student.studentID)}
-                                className="p-1 text-red-600 hover:text-red-800 transition-colors duration-200"
-                                title="Delete student"
-                              >
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleDelete(student.studentID)
+                                  }}
+                                  className="p-1 text-red-600 hover:text-red-800 transition-colors duration-200"
+                                  title="Delete student"
+                                >
                                 <Trash2 className="w-4 h-4" />
                               </button>
                             </div>
@@ -393,6 +420,120 @@ function Students() {
           </div>
         </div>
       </div>
+
+      {/* Edit Student Modal */}
+      {showEditModal && editingStudent && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-[480px] max-w-full mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Edit Student</h2>
+              <button 
+                onClick={() => {
+                  setShowEditModal(false)
+                  setEditingStudent(null)
+                }}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Student ID</label>
+                <input
+                  type="text"
+                  name="studentID"
+                  value={editingStudent.studentID}
+                  onChange={handleEditChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-100"
+                  disabled
+                />
+                <p className="text-xs text-gray-500 mt-1">Student ID cannot be changed</p>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={editingStudent.name}
+                  onChange={handleEditChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={editingStudent.email}
+                  onChange={handleEditChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Roll Number</label>
+                <input
+                  type="text"
+                  name="rollNumber"
+                  value={editingStudent.rollNumber}
+                  onChange={handleEditChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Semester</label>
+                <select
+                  name="sem"
+                  value={editingStudent.sem}
+                  onChange={handleEditChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  {[...Array(8)].map((_, i) => (
+                    <option key={i + 1} value={i + 1}>
+                      Semester {i + 1}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            
+            <div className="flex justify-end mt-6 gap-3">
+              <button
+                onClick={() => {
+                  setShowEditModal(false)
+                  setEditingStudent(null)
+                }}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                disabled={updatingStudent}
+                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 flex items-center"
+              >
+                {updatingStudent ? (
+                  <>
+                    <LoaderCircle className="w-4 h-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4 mr-2" />
+                    Save Changes
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {showDownloadModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-[480px]">
@@ -471,4 +612,3 @@ function Students() {
 }
 
 export default Students
-

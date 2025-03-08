@@ -8,7 +8,7 @@ function LogOut() {
   const navigate = useNavigate()
 
   const handleLogout = useCallback(async () => {
-    if (window.confirm("Are you sure to logout ???")) {
+    
       try {
         const response = await axios.post(
           "http://localhost:8080/auth/admin/logout",
@@ -19,6 +19,7 @@ function LogOut() {
             },
           },
         )
+        console.log(response.data)
         localStorage.removeItem("token")
         localStorage.removeItem("adminEmail")
         localStorage.removeItem("question")
@@ -28,9 +29,6 @@ function LogOut() {
         console.error("Logout failed", error)
         alert("Logout failed, please try again.")
       }
-    } else {
-      navigate('/admin')
-    }
   }, [navigate]) // Memoizing the function
 
   useEffect(() => {

@@ -14,6 +14,7 @@ const AdminNavbar = (props) => {
         // { path: "/admin/manage-exam", label: "Manage Exam" },
         // { path: "/admin/performance", label: "Performance" },
         { path: "/admin/students", label: "Students" },
+        { path: "/admin/offline-score", label: "Offline-score" },
         { path: "/admin/logout", label: "Logout" },
     ];
 
@@ -38,8 +39,8 @@ const AdminNavbar = (props) => {
                             key={link.path}
                             to={link.path}
                             className={`block px-4 py-2 transition ${location.pathname === link.path
-                                ? "bg-gray-700 text-white"
-                                : "hover:bg-gray-700 hover:text-white"
+                                    ? "bg-gray-700 text-white"
+                                    : "hover:bg-gray-700 hover:text-white"
                                 }`}
                         >
                             {link.label}
@@ -55,7 +56,7 @@ const AdminNavbar = (props) => {
             </button>
             <div className="flex-1">
                 <div>{props.children}</div>
-            </div>
+            </div> 
         </div>
     );
 };

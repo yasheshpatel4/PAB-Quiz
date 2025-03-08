@@ -81,4 +81,16 @@ public class Student {
     public void setAdmins(List<Admin> admins) {
         this.admins = admins;
     }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "studentID='" + studentID + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", rollNumber='" + rollNumber + '\'' +
+                ", sem='" + sem + '\'' +
+                ", admins=" + admins +
+                '}';
+    }
 }

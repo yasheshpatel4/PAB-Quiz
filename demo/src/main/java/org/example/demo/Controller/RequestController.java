@@ -214,4 +214,9 @@ public class RequestController {
         }
     }
 
+    @PatchMapping("/admin/updatestudent/{studentID}")
+    public ResponseEntity<String> updateStudent(@PathVariable String studentID, @RequestBody Student updatedStudent) {
+        return signUpservice.updateStudent(studentID, updatedStudent);
+    }
+
 }

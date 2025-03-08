@@ -276,4 +276,23 @@ public class SignUpservice {
         return true;
     }
 
+    public ResponseEntity<String> updateStudent(String id, Student updatedStudent) {
+
+        String email = updatedStudent.getEmail();
+        Student existingStudent = studentRepository.findByEmailAndStudentID(email,id);
+        if (existingStudent!=null) {
+
+            if (updatedStudent.getRollNumber() != null) {
+                existingStudent.setRollNumber(updatedStudent.getRollNumber());
+            }
+            if (updatedStudent.getSem() != null) {
+                existingStudent.setSem(updatedStudent.getSem());
+            }
+
+            studentRepository.save(existingStudent);
+            return ResponseEntity.ok("Student updated successfully");
+        } else {
+            return ResponseEntity.badRequest().body("Student not found");
+        }
+    }
 }

@@ -17,6 +17,10 @@ import PerformancePage from "./Components/Admin(Faculty)/PerformancePage";
 import AddQuestionPage from "./Components/Admin(Faculty)/AddQuestionPage";
 import QuestionUpload from "./Components/Admin(Faculty)/QuestionUpload";
 import StudentScorePage from "./Components/Admin(Faculty)/StudentScorePage";
+// import OfflineScore from "./Components/Admin(Faculty)/OfflineScore"
+// import OfflineScoreAnalysis from "./Components/Admin(Faculty)/OfflineScoreAnalysis"
+import OfflineScore from "./Components/Admin(Faculty)/offline-score";
+import OfflineScoreAnalysis from "./Components/Admin(Faculty)/offline-score-analysis";
 
 const App = () => {
   return (
@@ -32,10 +36,12 @@ const App = () => {
               <Route path="addquestion" element={<AddQuestionPage />} />
               <Route path="/addquestion/uploadquestion" element={<QuestionUpload />} />
               <Route path="performance" element={<Performance />} />
-              <Route path="performance/:id" element={<PerformancePage />} />
+              <Route path="performance/:id" element={<PerformancePage/>} />
               <Route path="students" element={<Students />} />
               <Route path="logout" element={<LogOut />} />
-              <Route path="studentscore/:id/:email" element={<StudentScorePage />} />
+              <Route path="studentscore/:id/:email" element={<StudentScorePage/>}/>
+              <Route path="offline-score" element={<OfflineScore />} />
+              <Route path="offline-score/analysis/:studentId/:quizId" element={<OfflineScoreAnalysis />} />
             </Routes>
           </AdminNavbar>
         }

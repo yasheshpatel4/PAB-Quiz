@@ -36,8 +36,8 @@ const StudentNavbar = (props) => {
                             key={link.path}
                             to={link.path}
                             className={`block px-4 py-2 transition ${location.pathname === link.path
-                                ? "bg-gray-700 text-white"
-                                : "hover:bg-gray-700 hover:text-white"
+                                    ? "bg-gray-700 text-white"
+                                    : "hover:bg-gray-700 hover:text-white"
                                 }`}
                         >
                             {link.label}

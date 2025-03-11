@@ -19,8 +19,8 @@ const QuizDisplay = () => {
         const response = await axios.get("http://localhost:8080/auth/admin/getallquiz", {
           params: { email: localStorage.getItem("adminEmail") },
         });
+        console.log(response.data)
         const quizdata = Array.isArray(response.data) ? response.data : [];
-
         const counts = {};
         await Promise.all(
           quizdata.map(async (quiz) => {
@@ -150,7 +150,7 @@ const QuizDisplay = () => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {questionCounts[item.quizid] || 0}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.isAvailable === true ? "yes" : "no"}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.available === true ? "yes" : "no"}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <div className="flex gap-2">
                     <button

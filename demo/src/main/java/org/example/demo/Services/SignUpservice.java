@@ -15,6 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -95,27 +97,46 @@ public class SignUpservice {
         return ResponseEntity.ok(students);
     }
 
+    public boolean deleteStudent(String adminEmail, String studentId) {
+        Optional<Student> studentOptional = studentRepository.findById(studentId);
 
-    public boolean deleteStudent(String id) {
-        Optional<Student> studentOptional = studentRepository.findById(id);
         if (studentOptional.isPresent()) {
-            studentRepository.delete(studentOptional.get());
-            return true;
-        } else {
-            return false;
+            Student student = studentOptional.get();
+
+            // Find the admin who is trying to delete
+            Optional<Admin> adminOptional = adminRepository.findById(adminEmail);
+
+            if (adminOptional.isPresent()) {
+                Admin admin = adminOptional.get();
+
+                // Remove student from admin's list
+                if (admin.getStudents().contains(student)) {
+                    admin.getStudents().remove(student);
+                    adminRepository.save(admin); // Update admin to reflect removal
+
+                    // Check if any other admin is linked to this student
+                    List<Admin> adminsWithStudent = adminRepository.findByStudentsContaining(studentId);
+                    if (adminsWithStudent.isEmpty()) {
+                        studentRepository.delete(student); // Delete student record
+                    }
+                    return true;
+                }
+            }
         }
+        return false;
     }
 
-    public String addQuiz(Quiz quiz , String adminEmail) {
+    public String addQuiz(Quiz quiz, String adminEmail) {
         Admin admin = adminRepository.findByEmail(adminEmail);
         if (admin == null) {
             return "Error: Admin not found!";
         }
         quiz.setAdminObj(admin);
-        quizRepository.save(quiz);
-
+        quizRepository.save(quiz); // createdAt will remain null
+//        System.out.println(quiz);
         return "Quiz added successfully!";
     }
+
 
     public int getTotalQuiz(String email) {
         long ans = quizRepository.countByAdminEmail(email);
@@ -188,10 +209,12 @@ public class SignUpservice {
     }
 
     public String uploadquiz(int quizid) {
-        Quiz q = quizRepository.findById(quizid).get();
+        Quiz q = quizRepository.findById(quizid).orElseThrow(() -> new RuntimeException("Quiz not found"));
         q.setAvailable(true);
+        q.setCreatedAt(LocalDateTime.now()); // Set the upload time
         quizRepository.save(q);
-        return "upload successfully!";
+//        System.out.println(q);
+        return "Upload successfully!";
     }
 
     public void saveQuestionToExcel(MultipartFile file, int quizid) throws IOException {

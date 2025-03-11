@@ -6,7 +6,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -31,6 +34,11 @@ public class Quiz {
 
     @JoinColumn(name = "available")
     private boolean isAvailable = false;
+
+    @Column(name = "created_at", updatable = true, nullable = true)
+    @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
     @ManyToOne
     @JoinColumn(name = "admin_email")
@@ -103,5 +111,28 @@ public class Quiz {
 
     public void setAvailable(boolean available) {
         isAvailable = available;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    @Override
+    public String toString() {
+        return "Quiz{" +
+                "Quizid=" + Quizid +
+                ", QuizSubject='" + QuizSubject + '\'' +
+                ", QuizSem=" + QuizSem +
+                ", QuizDuration=" + QuizDuration +
+                ", QuizDescription='" + QuizDescription + '\'' +
+                ", isAvailable=" + isAvailable +
+                ", createdAt=" + createdAt +
+                ", adminObj=" + adminObj +
+                ", questions=" + questions +
+                '}';
     }
 }

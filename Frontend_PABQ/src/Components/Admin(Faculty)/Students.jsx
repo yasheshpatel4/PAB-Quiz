@@ -114,9 +114,11 @@ function Students() {
     if (!confirmed) return
 
     try {
-      await axios.delete(`http://localhost:8080/auth/admin/deletestudent/${id}`)
+      const response = await axios.delete(`http://localhost:8080/auth/admin/deletestudent/${id}`, {
+        params: { email: localStorage.getItem("adminEmail") }
+      })
       setStudents(students.filter((student) => student.studentID !== id))
-      alert("Student deleted successfully.")
+      alert(response.data)
     } catch (err) {
       console.error("Error deleting student:", err.response?.data || err.message)
       setError(err.response?.data || "Failed to delete student. Please try again.")

@@ -102,9 +102,8 @@ public class RequestController {
     }
 
     @DeleteMapping("/admin/deletestudent/{id}")
-    public ResponseEntity<String> deleteStudent(@PathVariable String id) {
-        System.out.println("Received delete request for ID: " + id);
-        boolean deleted = signUpservice.deleteStudent(id);
+    public ResponseEntity<String> deleteStudent(@RequestParam String email,@PathVariable String id) {
+        boolean deleted = signUpservice.deleteStudent(email,id);
         if (deleted) {
             return ResponseEntity.ok("Student deleted successfully");
         } else {
@@ -178,6 +177,7 @@ public class RequestController {
 
     @PostMapping("/admin/upload/{quizid}")
     public ResponseEntity<String> upload(@PathVariable int quizid){
+
         String ans = signUpservice.uploadquiz(quizid);
         return ResponseEntity.ok(ans);
     }

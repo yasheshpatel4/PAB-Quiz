@@ -5,7 +5,8 @@ import axios from 'axios';
 import Modal from './admindashboard/Modal';
 import Input from './admindashboard/Input';
 import Button from './admindashboard/Button';
-import { Trash2, Edit2 } from "lucide-react";
+import * as XLSX from "xlsx"
+import { Search, Upload, Edit2, AlertCircle,Trash2, LoaderCircle, Download, X, Save } from 'lucide-react'
 
 const AddQuestionPage = () => {
     const quizid = localStorage.getItem('quizid');
@@ -107,32 +108,64 @@ const AddQuestionPage = () => {
         }
     };
 
+    const handleDownloadTemplate = () => {
+          // Create a template Excel file
+          const template = [
+            {
+              "Question": "xyz",
+              "Answer": "xyz",
+              "Option 1": "xyx",
+              "Option 2": "xyz",
+              "Option 3": "xyz",
+              "Option 4": "xyz",
+            }
+          ]
+    
+          const worksheet = XLSX.utils.json_to_sheet(template)
+          const workbook = XLSX.utils.book_new()
+          XLSX.utils.book_append_sheet(workbook, worksheet, "Question Template")
+          
+          // Generate Excel file and trigger download
+          XLSX.writeFile(workbook, "Question add template.xlsx")
+        }
+
     return (
         <AdminNavbar>
             <div className="ml-64 p-6 bg-gray-50 min-h-screen">
                 <div className="flex justify-between items-center mb-6">
-                    <button
-                        onClick={() => {
-                            setFormData({
-                                question: '',
-                                answer: '',
-                                option1: '',
-                                option2: '',
-                                option3: '',
-                                option4: '',
-                            });
-                            setShowForm(true);
-                        }}
-                        disabled={questions.length >= 20}
-                        className={`px-6 py-2 rounded-lg transition duration-300 shadow-md ${questions.length >= 20
-                            ? 'bg-gray-400 cursor-not-allowed'
-                            : 'bg-green-600 hover:bg-green-700 text-white'
-                            }`}
-                    >
-                        {editingIndex !== null ? "Edit Question" : "Add Question"}
-                    </button>
+                    
                     <h2 className="text-2xl font-bold text-gray-800">Manage Questions for Quiz ID: {quizid}</h2>
                     <div className="flex space-x-4">
+
+                        <button
+                            onClick={() => {
+                                setFormData({
+                                    question: '',
+                                    answer: '',
+                                    option1: '',
+                                    option2: '',
+                                    option3: '',
+                                    option4: '',
+                                });
+                                setShowForm(true);
+                            }}
+                            disabled={questions.length >= 20}
+                            className={`px-6 py-2 rounded-lg transition duration-300 shadow-md ${questions.length >= 20
+                                ? 'bg-gray-400 cursor-not-allowed'
+                                : 'bg-green-600 hover:bg-green-700 text-white'
+                                }`}
+                        >
+                            {editingIndex !== null ? "Edit Question" : "Add Question"}
+                        </button>
+
+                        <button
+                            onClick={handleDownloadTemplate}
+                            className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 mr-2"
+                        >
+                            <Download className="w-4 h-4 mr-2" />
+                            Template
+                        </button>
+
                         <button
                             onClick={handleUpload}
                             className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition duration-300 shadow-md"
@@ -175,6 +208,7 @@ const AddQuestionPage = () => {
                         <table className="w-full text-sm text-left border-collapse">
                             <thead className="bg-gray-200 text-gray-700">
                                 <tr>
+                                    <th className="px-4 py-2">Number</th>
                                     <th className="px-4 py-2">Question</th>
                                     <th className="px-4 py-2">Answer</th>
                                     <th className="px-4 py-2">Options 1</th>
@@ -187,6 +221,7 @@ const AddQuestionPage = () => {
                             <tbody>
                                 {questions.map((q, index) => (
                                     <tr key={index} className="border-b hover:bg-gray-100 transition duration-200">
+                                        <td className="px-4 py-2">{index}</td>
                                         <td className="px-4 py-2">{q.question}</td>
                                         <td className="px-4 py-2">{q.answer}</td>
                                         <td className="px-4 py-2">{q.option1}</td>

@@ -65,23 +65,27 @@ public class SignUpservice {
             return "Error: Admin not found!";
         }
 
-        // Ensure student has a non-null list of admins
-        if (student.getAdmins() == null) {
-            student.setAdmins(new ArrayList<>());  // ✅ Initialize if null
+        // Check if the student already exists
+        Student existingStudent = studentRepository.findByEmail(student.getEmail()); // Assuming email is unique
+        if (existingStudent != null) {
+            student = existingStudent; // Use existing student instead of creating a new one
+        } else {
+            student.setAdmins(new ArrayList<>()); // Initialize if null
+            student = studentRepository.save(student); // Save only if new
         }
 
-        // **Save the student first**
-        student = studentRepository.save(student); // ✅ Saves student before associating
-
         // Establish Many-to-Many relationship
-        admin.getStudents().add(student);
-        student.getAdmins().add(admin);
+        if (!admin.getStudents().contains(student)) { // Avoid duplicate relationships
+            admin.getStudents().add(student);
+            student.getAdmins().add(admin);
+        }
 
         // Save the relationship
         adminRepository.save(admin);
 
         return "Student added successfully!";
     }
+
 
     public int gettotalstudents(String adminEmail) {
         return (int) studentRepository.countStudentsByAdminEmail(adminEmail);

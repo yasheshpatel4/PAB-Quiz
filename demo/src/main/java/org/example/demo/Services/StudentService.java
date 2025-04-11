@@ -80,11 +80,11 @@ public class StudentService {
                 }
 
                 Student student = new Student();
-                student.setStudentID(getCellValueAsString(currentRow.getCell(0)));
-                student.setName(getCellValueAsString(currentRow.getCell(1)));
-                student.setEmail(getCellValueAsString(currentRow.getCell(2)));
-                student.setRollNumber(getCellValueAsString(currentRow.getCell(3)));
-                student.setSem(getCellValueAsString(currentRow.getCell(4)));
+                student.setStudentID(getCellValueAsString(currentRow.getCell(4)));
+                student.setName(getCellValueAsString(currentRow.getCell(0)));
+                student.setEmail(getCellValueAsString(currentRow.getCell(1)));
+                student.setRollNumber(getCellValueAsString(currentRow.getCell(2)));
+                student.setSem(getCellValueAsString(currentRow.getCell(3)));
                 student.getAdmins().add(admin); // Associate student with admin
 
                 students.add(student);

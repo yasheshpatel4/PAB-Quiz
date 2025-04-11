@@ -5,6 +5,7 @@ import Modal from './Modal';
 import Input from './Input';
 import Button from './Button';
 import QuizDisplay from '../QuizDisplay';
+import Navbar2 from '../../NavBar/Navbar2';
 
 const Dashboard = () => {
   const [totalStudents, setTotalStudents] = useState(0);
@@ -131,8 +132,6 @@ const Dashboard = () => {
     }
 
     try {
-
-
       const response = await axios.post('http://localhost:8080/auth/admin/createquiz', quizForm, {
         params: { adminEmail: adminEmail },
       });
@@ -148,6 +147,7 @@ const Dashboard = () => {
 
   return (
     <div className="ml-40 container p-20">
+      {/* <Navbar2/> */}
       <h1 className="ml-8 text-3xl font-bold mb-4">Admin Dashboard</h1>
       <div className="ml-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-8">
         <DashboardCard title="Total Students :" value={totalStudents} description="View the total number of students currently registered in the system." />

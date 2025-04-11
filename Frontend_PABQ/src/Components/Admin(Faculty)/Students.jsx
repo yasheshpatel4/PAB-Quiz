@@ -273,6 +273,25 @@ function Students() {
       </div>
     )
   }
+   const handleDownloadTemplate = () => {
+      // Create a template Excel file
+      const template = [
+        {
+          "NAME": "xyz",
+          "EMAIL": "22itxxxxx@ddu.ac.in",
+          "ROLL NUMBER": "ITXXX",
+          "SEMESTER": "[1-6]",
+          "STUDNET ID" : "22ITXXXXX"
+        }
+      ]
+
+      const worksheet = XLSX.utils.json_to_sheet(template)
+      const workbook = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Student Template")
+      
+      // Generate Excel file and trigger download
+      XLSX.writeFile(workbook, "studentaddtemplate.xlsx")
+    }
 
   if (error) {
     return (
@@ -294,14 +313,6 @@ function Students() {
     )
   }
 
-  if (!Array.isArray(students) || students.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-xl text-gray-600 font-medium">No students found.</p>
-      </div>
-    )
-  }
-
   return (
     <AdminNavbar>
       <div className="ml-64 min-h-screen bg-gray-50">
@@ -310,6 +321,15 @@ function Students() {
             <div className="flex justify-between items-center mb-8">
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Student Management</h1>
               <div>
+
+                <button
+                  onClick={handleDownloadTemplate}
+                  className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 mr-2"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Template
+                </button>
+                
                 <button
                   onClick={toggleUpload}
                   className="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors duration-200 mr-2"
@@ -329,7 +349,7 @@ function Students() {
                   className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200"
                 >
                   <Download className="w-4 h-4 mr-2" />
-                  Download
+                  Download(RESULT)
                 </button>
               </div>
             </div>

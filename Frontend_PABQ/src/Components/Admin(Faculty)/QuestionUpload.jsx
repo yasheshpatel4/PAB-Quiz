@@ -1,6 +1,12 @@
 import { useState } from "react";
-import { Upload, AlertCircle, CheckCircle, ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom"; // Assuming you're using React Router
+import {
+    Upload,
+    AlertCircle,
+    CheckCircle,
+    ArrowLeft,
+    Sparkles
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function QuestionUpload() {
@@ -8,7 +14,12 @@ function QuestionUpload() {
     const [uploading, setUploading] = useState(false);
     const [message, setMessage] = useState("");
     const [status, setStatus] = useState("idle");
-    const navigate = useNavigate(); // For navigation
+    const navigate = useNavigate();
+
+    // AI Question Generation Fields
+    const [numQuestions, setNumQuestions] = useState(15);
+    const [description, setDescription] = useState("");
+    const [difficulty, setDifficulty] = useState("medium");
 
     const handleFileChange = (e) => {
         if (e.target.files) {
@@ -29,20 +40,17 @@ function QuestionUpload() {
         setMessage("");
 
         const formData = new FormData();
-        formData.append("file", file); // Ensure this matches @RequestParam("file")
+        formData.append("file", file);
 
         try {
             const response = await axios.post(
                 `http://localhost:8080/auth/admin/uploadquestion/${localStorage.getItem("quizid")}`,
                 formData,
-                {
-                    headers: { "Content-Type": "multipart/form-data" },
-                }
+                { headers: { "Content-Type": "multipart/form-data" } }
             );
-            setMessage(response.data)
+            setMessage(response.data);
             setStatus("success");
         } catch (error) {
-            console.error("Error uploading file:", error);
             setMessage(`Error uploading file: ${error.response?.data || error.message}`);
             setStatus("error");
         } finally {
@@ -50,9 +58,40 @@ function QuestionUpload() {
         }
     };
 
+    const handleAIGenerate = async () => {
+        if (numQuestions < 15 || numQuestions > 30 || description.trim() === "") {
+            setMessage("Please provide valid input for AI generation.");
+            setStatus("error");
+            return;
+        }
+
+        setUploading(true);
+        setMessage("");
+
+        const params = new URLSearchParams({
+            numQuestions,
+            description,
+            difficulty,
+        });
+
+        try {
+            const response = await axios.post(
+                `http://localhost:8080/auth/admin/aigenerate/${localStorage.getItem("quizid")}?${params}`
+            );
+            setMessage(response.data);
+            setStatus("success");
+        } catch (error) {
+            setMessage(`Error generating questions: ${error.response?.data || error.message}`);
+            setStatus("error");
+        } finally {
+            setUploading(false);
+        }
+    };
+    
 
     return (
-        <div className="ml-64 min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4">
+        <div className="ml-64 min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex flex-col items-center justify-center p-4 space-y-10">
+            {/* Box 1 - Manual Upload */}
             <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border border-gray-100">
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-gray-800 mb-2">Question Upload</h1>
@@ -60,7 +99,6 @@ function QuestionUpload() {
                 </div>
 
                 <div className="space-y-6">
-                    {/* File Upload Input */}
                     <div className="relative">
                         <input
                             type="file"
@@ -82,17 +120,16 @@ function QuestionUpload() {
                             </div>
                         </label>
                         {file && (
-                            <div className="mt-2 text-sm text-gray-600 flex items-center justify-center">
+                            <div className="mt-2 text-sm text-gray-600 text-center">
                                 Selected: {file.name}
                             </div>
                         )}
                     </div>
 
-                    {/* Upload Button */}
                     <button
                         onClick={handleUpload}
                         disabled={uploading || !file}
-                        className="w-full py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md font-semibold bg-green-600 text-white hover:bg-green-700 transition-all disabled:opacity-50"
                     >
                         {uploading ? (
                             <>
@@ -106,33 +143,100 @@ function QuestionUpload() {
                             </>
                         )}
                     </button>
-
-                    {/* Back to List Button */}
-                    <button
-                        onClick={() => navigate(`/admin/addquestion`)} // Adjust the path as needed
-                        className="w-full py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-gray-300 font-semibold text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition-all"
-                    >
-                        <ArrowLeft className="w-4 h-4" />
-                        Back to List
-                    </button>
-
-                    {/* Status Message */}
-                    {message && (
-                        <div
-                            className={`flex items-center gap-2 p-4 rounded-lg ${status === "success"
-                                ? "bg-green-50 text-green-700"
-                                : "bg-red-50 text-red-700"
-                                }`}
-                        >
-                            {status === "success" ? (
-                                <CheckCircle className="w-5 h-5" />
-                            ) : (
-                                <AlertCircle className="w-5 h-5" />
-                            )}
-                            <p className="text-sm font-medium">{message}</p>
-                        </div>
-                    )}
                 </div>
+            </div>
+
+            {/* Box 2 - AI Generated Questions */}
+            <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border border-gray-100">
+                <div className="text-center mb-8">
+                    <h1 className="text-2xl font-bold text-indigo-700 mb-2">Generate Questions using AI</h1>
+                    <p className="text-gray-600">Auto-generate questions based on description</p>
+                </div>
+
+                <div className="space-y-4">
+                    <div>
+                        <label className="block mb-1 text-sm font-medium text-gray-700">
+                            Number of Questions
+                        </label>
+                        <input
+                            type="number"
+                            min="15"
+                            max="30"
+                            value={numQuestions}
+                            onChange={(e) => setNumQuestions(e.target.value)}
+                            className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block mb-1 text-sm font-medium text-gray-700">
+                            Description (e.g. Subject, Topic)
+                        </label>
+                        <textarea
+                            rows="3"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block mb-1 text-sm font-medium text-gray-700">
+                            Difficulty
+                        </label>
+                        <select
+                            value={difficulty}
+                            onChange={(e) => setDifficulty(e.target.value)}
+                            className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                        >
+                            <option value="medium">Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+
+                    <button
+                        onClick={handleAIGenerate}
+                        disabled={uploading}
+                        className="w-full py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition-all disabled:opacity-50"
+                    >
+                        {uploading ? (
+                            <>
+                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                Generating...
+                            </>
+                        ) : (
+                            <>
+                                <Sparkles className="w-4 h-4" />
+                                Generate Questions
+                            </>
+                        )}
+                    </button>
+                </div>
+            </div>
+
+            {/* Back and Message */}
+            <div className="w-full max-w-md space-y-4">
+                <button
+                    onClick={() => navigate(`/admin/addquestion`)}
+                    className="w-full py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-gray-300 font-semibold text-gray-700 hover:bg-gray-100"
+                >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back to List
+                </button>
+
+                {message && (
+                    <div className={`flex items-center gap-2 p-4 rounded-lg ${status === "success"
+                        ? "bg-green-50 text-green-700"
+                        : "bg-red-50 text-red-700"
+                        }`}>
+                        {status === "success" ? (
+                            <CheckCircle className="w-5 h-5" />
+                        ) : (
+                            <AlertCircle className="w-5 h-5" />
+                        )}
+                        <p className="text-sm font-medium">{message}</p>
+                    </div>
+                )}
             </div>
         </div>
     );

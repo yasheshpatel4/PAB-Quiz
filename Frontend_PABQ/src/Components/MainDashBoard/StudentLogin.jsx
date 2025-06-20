@@ -45,7 +45,7 @@ const Login = () => {
                 alert(response.data);
                 localStorage.setItem("studentEmail", email);
                 localStorage.setItem("studentID", studentId);
-                navigate("/student"); // Redirect to student dashboard
+                navigate("/student"); 
                 setEmail("");
                 setStudentId("");
             })

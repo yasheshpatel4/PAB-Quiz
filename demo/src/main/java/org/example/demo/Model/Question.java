@@ -25,14 +25,6 @@ public class Question {
     @JsonProperty("option1")
     private String option1;
 
-    public int getQuestionid() {
-        return questionid;
-    }
-
-    public void setQuestionid(int questionid) {
-        this.questionid = questionid;
-    }
-
     @JsonProperty("option2")
     private String option2;
 
@@ -41,6 +33,16 @@ public class Question {
 
     @JsonProperty("option4")
     private String option4;
+
+    public int getQuestionid() {
+        return questionid;
+    }
+
+    public void setQuestionid(int questionid) {
+        this.questionid = questionid;
+    }
+
+
 
     @ManyToOne
     @JoinColumn(name = "quizid")

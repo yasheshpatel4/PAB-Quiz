@@ -1,5 +1,7 @@
 package org.example.demo.Services;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -9,8 +11,11 @@ import org.example.demo.Model.Quiz;
 import org.example.demo.Model.Student;
 import org.example.demo.Repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -21,7 +26,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@PropertySource("classpath:application-key.properties")
 public class SignUpservice {
+
+    @Value("${gemini.api.key}")
+    private String geminiApiKey;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private Repoadmin adminRepository;
@@ -86,7 +97,6 @@ public class SignUpservice {
         return "Student added successfully!";
     }
 
-
     public int gettotalstudents(String adminEmail) {
         return (int) studentRepository.countStudentsByAdminEmail(adminEmail);
     }
@@ -140,7 +150,6 @@ public class SignUpservice {
 //        System.out.println(quiz);
         return "Quiz added successfully!";
     }
-
 
     public int getTotalQuiz(String email) {
         long ans = quizRepository.countByAdminEmail(email);
@@ -322,4 +331,61 @@ public class SignUpservice {
             return ResponseEntity.badRequest().body("Student not found");
         }
     }
+
+    public String generateQuestions(int quizid, int numQuestions, String description, String difficulty) {
+        String prompt = String.format("""
+        Generate %d %s difficulty multiple-choice questions on:
+        %s
+
+        Format your response strictly as a JSON array with the following structure:
+        [
+          {
+            "question": "...",
+            "answer": "...",
+            "option1": "...",
+            "option2": "...",
+            "option3": "...",
+            "option4": "..."
+          }
+        ]
+    """, numQuestions, difficulty, description);
+
+        Map<String, Object> requestBody = new HashMap<>();
+        List<Map<String, String>> parts = new ArrayList<>();
+        parts.add(Map.of("text", prompt));
+        requestBody.put("contents", List.of(Map.of("parts", parts)));
+
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + geminiApiKey;
+
+        RestTemplate restTemplate = new RestTemplate();
+        try {
+            JsonNode response = restTemplate.postForObject(url, requestBody, JsonNode.class);
+            String text = response.at("/candidates/0/content/parts/0/text").asText();
+
+            // ✅ Strip markdown/code block formatting
+            text = text.replaceAll("```json", "")
+                    .replaceAll("```", "")
+                    .trim();
+
+            // ✅ Parse the cleaned text to your object
+            List<Question> questions = Arrays.asList(objectMapper.readValue(text, Question[].class));
+
+            Optional<Quiz> quizOpt = quizRepository.findById(quizid);
+            if (quizOpt.isEmpty()) return "Quiz ID not found.";
+            Quiz quiz = quizOpt.get();
+
+            for (Question q : questions) {
+                q.setQuiz(quiz);
+                questionRepository.save(q);
+            }
+
+            return questions.size() + " questions generated and saved successfully.";
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error while generating questions: " + e.getMessage();
+        }
+    }
+
+
 }

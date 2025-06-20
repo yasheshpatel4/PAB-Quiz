@@ -5,7 +5,7 @@ import Modal from './Modal';
 import Input from './Input';
 import Button from './Button';
 import QuizDisplay from '../QuizDisplay';
-import Navbar2 from '../../NavBar/Navbar2';
+// import Navbar2 from '../../NavBar/Navbar2';
 
 const Dashboard = () => {
   const [totalStudents, setTotalStudents] = useState(0);

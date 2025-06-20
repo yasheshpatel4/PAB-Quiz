@@ -6,7 +6,7 @@ import Modal from './admindashboard/Modal';
 import Input from './admindashboard/Input';
 import Button from './admindashboard/Button';
 import * as XLSX from "xlsx"
-import { Search, Upload, Edit2, AlertCircle,Trash2, LoaderCircle, Download, X, Save } from 'lucide-react'
+import { Edit2,Trash2, Download } from 'lucide-react'
 
 const AddQuestionPage = () => {
     const quizid = localStorage.getItem('quizid');

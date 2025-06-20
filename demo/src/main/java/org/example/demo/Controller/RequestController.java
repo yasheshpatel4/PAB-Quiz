@@ -21,9 +21,9 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 
-@RequestMapping("/auth")
 @RestController
-@CrossOrigin
+@RequestMapping("/auth")
+@CrossOrigin(origins = "http://localhost:5173")
 public class RequestController {
 
     @Autowired
@@ -120,11 +120,11 @@ public class RequestController {
     @PostMapping("/admin/createquiz")
     public ResponseEntity<String> createQuiz(@RequestBody Quiz quiz, @RequestParam String adminEmail) {
 
-       String result = signUpservice.addQuiz(quiz, adminEmail);
-       if(result.equals("Error: Email already exists!")) {
-           return ResponseEntity.status(400).body(result);
-       }
-       return ResponseEntity.ok("Quiz created successfully");
+        String result = signUpservice.addQuiz(quiz, adminEmail);
+        if(result.equals("Error: Email already exists!")) {
+            return ResponseEntity.status(400).body(result);
+        }
+        return ResponseEntity.ok("Quiz created successfully");
     }
 
     @GetMapping("/admin/noofquiz")
@@ -214,11 +214,30 @@ public class RequestController {
         }
     }
 
+    @PostMapping("/admin/aigenerate/{quizid}") // appended to base path
+    public ResponseEntity<String> generateAigene(
+            @PathVariable int quizid,
+            @RequestParam int numQuestions,
+            @RequestParam String description,
+            @RequestParam String difficulty) {
+
+        if (numQuestions < 15 || numQuestions > 30) {
+            return ResponseEntity.badRequest().body("Number of questions must be between 15 and 30.");
+        }
+
+        if (description.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Description cannot be empty.");
+        }
+
+        return ResponseEntity.ok(
+                signUpservice.generateQuestions(quizid, numQuestions, description, difficulty)
+        );
+
+    }
+
     @PatchMapping("/admin/updatestudent/{studentID}")
     public ResponseEntity<String> updateStudent(@PathVariable String studentID, @RequestBody Student updatedStudent) {
         return signUpservice.updateStudent(studentID, updatedStudent);
     }
-
-
 
 }

@@ -144,7 +144,9 @@ function Students() {
       }
 
       // Fetch basic student data
-      const studentsResponse = await axios.get("http://localhost:8080/auth/admin/getallstudents")
+      const studentsResponse = await axios.get("http://localhost:8080/auth/admin/getallstudents", {
+        params: { email: localStorage.getItem("adminEmail") }
+      })
       const studentsData = studentsResponse.data
 
       if (!Array.isArray(studentsData) || studentsData.length === 0) {
@@ -559,7 +561,7 @@ function Students() {
       {showDownloadModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-[480px]">
-            <h2 className="text-xl font-semibold mb-4">Download Students Data</h2>
+            <h2 className="text-xl font-semibold mb-4">Download Students Result</h2>
 
             {/* Semester Selection */}
             <div className="mb-6">

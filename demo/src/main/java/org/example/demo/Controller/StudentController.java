@@ -41,7 +41,6 @@ public class StudentController {
 
             studentService.saveStudentsFromExcel(file, adminEmail);
 
-
             return ResponseEntity.ok("File uploaded successfully and processed.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error uploading file: " + e.getMessage());
@@ -70,15 +69,15 @@ public class StudentController {
                                              @RequestParam String studentEmail,
                                              @RequestBody Map<Integer,String> answers,
                                              @RequestParam Boolean tabViolation
-                                             ) {
+    ) {
         studentService.submitQuiz(quizId,studentEmail,answers,tabViolation);
         return ResponseEntity.ok("Quiz submitted successfully");
     }
 
     @GetMapping("/completedquiz")
     public ResponseEntity<List<String>> completedQuiz(@RequestParam String studentEmail, @RequestParam String studentID) {
-        List<String> list =  studentService.completedquiz(studentEmail,studentID);
+        System.out.println(studentEmail + " " + studentID);
+        List<String> list = studentService.completedquiz(studentEmail, studentID);
         return ResponseEntity.ok(list);
     }
-
 }

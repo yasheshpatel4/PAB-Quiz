@@ -58,10 +58,8 @@ const LoginSignup = () => {
             axios
                 .post("http://localhost:8080/auth/admin/login", data)
                 .then((response) => {
-                    //alert(response.data);
-                    // Save admin email in localStorage
                     localStorage.setItem("adminEmail", email);
-                    navigate("/admin"); // Redirect to admin dashboard
+                    navigate("/admin"); 
                     setName("");
                     setEmail("");
                     setPassword("");

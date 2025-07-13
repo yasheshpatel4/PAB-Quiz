@@ -46,7 +46,7 @@ function QuizModal({ quiz, onClose }) {
 
     const fetchQuestions = async () => {
         try {
-            const response = await axios.get("http://localhost:8080/api/students/getquestion", {
+            const response = await axios.get("http://13.232.135.2:8080/api/students/getquestion", {
                 params: { quizId: quiz.quizid },
             });
 
@@ -104,7 +104,7 @@ function QuizModal({ quiz, onClose }) {
 
         try {
             const response = await axios.post(
-                `http://localhost:8080/api/students/submitQuiz`,
+                `http://13.232.135.2:8080/api/students/submitQuiz`,
                 requestBody,
                 {
                     params: { quizId: quiz.quizid, studentEmail, tabViolation }

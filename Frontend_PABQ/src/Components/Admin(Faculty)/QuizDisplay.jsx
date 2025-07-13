@@ -16,7 +16,7 @@ const QuizDisplay = () => {
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/auth/admin/getallquiz", {
+        const response = await axios.get("http://13.232.135.2:8080/auth/admin/getallquiz", {
           params: { email: localStorage.getItem("adminEmail") },
         });
         console.log(response.data)
@@ -25,7 +25,7 @@ const QuizDisplay = () => {
         await Promise.all(
           quizdata.map(async (quiz) => {
             try {
-              const countResponse = await axios.get(`http://localhost:8080/auth/admin/noofquestion/${quiz.quizid}`);
+              const countResponse = await axios.get(`http://13.232.135.2:8080/auth/admin/noofquestion/${quiz.quizid}`);
               counts[quiz.quizid] = countResponse.data;
             } catch (err) {
               console.error(`Error fetching question count for quiz ID ${quiz.quizid}:`, err);
@@ -58,7 +58,7 @@ const QuizDisplay = () => {
       const confirmUpload = window.confirm("Are you sure you want to upload the quiz?");
 
       if (confirmUpload) {
-        const response = await axios.post(`http://localhost:8080/auth/admin/upload/${id}`);
+        const response = await axios.post(`http://13.232.135.2:8080/auth/admin/upload/${id}`);
         alert(response.data);
       }
     } catch (err) {
@@ -73,7 +73,7 @@ const QuizDisplay = () => {
     if (!confirmed) return;
 
     try {
-      await axios.delete(`http://localhost:8080/auth/admin/deletequiz/${id}`);
+      await axios.delete(`http://13.232.135.2:8080/auth/admin/deletequiz/${id}`);
       setQuiz(quiz.filter((quiz) => quiz.quizid !== id));
       alert("Quiz deleted successfully.");
     } catch (err) {

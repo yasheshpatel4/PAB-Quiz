@@ -31,7 +31,7 @@ const AddQuestionPage = () => {
         }
         const fetchQuiz = async () => {
             try {
-                const response = await axios.get("http://localhost:8080/auth/admin/getallquestion", {
+                const response = await axios.get("http://13.232.135.2:8080/auth/admin/getallquestion", {
                     params: { quizid },
                 });
                 setQuestions(Array.isArray(response.data) ? response.data : []);
@@ -72,7 +72,7 @@ const AddQuestionPage = () => {
 
     const handleSubmit = async () => {
         try {
-            const response = await axios.post('http://localhost:8080/auth/admin/addquestion', questions, {
+            const response = await axios.post('http://13.232.135.2:8080/auth/admin/addquestion', questions, {
                 params: { quizid },
             });
             alert(response.data);
@@ -100,7 +100,7 @@ const AddQuestionPage = () => {
         }
 
         try {
-            const response = await axios.delete(`http://localhost:8080/auth/admin/deletequestion/${questionId}`);
+            const response = await axios.delete(`http://13.232.135.2:8080/auth/admin/deletequestion/${questionId}`);
             alert(response.data);
             window.location.reload();
         } catch (error) {

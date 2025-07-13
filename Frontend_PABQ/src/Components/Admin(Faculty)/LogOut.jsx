@@ -11,7 +11,7 @@ function LogOut() {
     
       try {
         const response = await axios.post(
-          "http://localhost:8080/auth/admin/logout",
+          "http://13.232.135.2:8080/auth/admin/logout",
           {},
           {
             headers: {

@@ -40,7 +40,7 @@ const Login = () => {
 
         // Login logic
         axios
-            .post("http://localhost:8080/auth/student/login", data)
+            .post("http://13.232.135.2:8080/auth/student/login", data)
             .then((response) => {
                 alert(response.data);
                 localStorage.setItem("studentEmail", email);

@@ -31,7 +31,7 @@ function StudentScorePage() {
   useEffect(() => {
     const fetchStudentExams = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/students/completedquiz", {
+        const response = await axios.get("http://13.232.135.2:8080/api/students/completedquiz", {
           params: {
             studentEmail: email,
             studentID: id,

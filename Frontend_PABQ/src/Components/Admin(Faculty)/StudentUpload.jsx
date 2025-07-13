@@ -45,7 +45,7 @@ function StudentUpload() {
     formData.append("adminEmail", adminEmail);
 
     try {
-      const response = await fetch("http://localhost:8080/api/students/upload", {
+      const response = await fetch("http://13.232.135.2:8080/api/students/upload", {
         method: "POST",
         body: formData, // No need to set `Content-Type`
       });

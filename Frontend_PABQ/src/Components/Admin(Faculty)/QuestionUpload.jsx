@@ -44,7 +44,7 @@ function QuestionUpload() {
 
         try {
             const response = await axios.post(
-                `http://localhost:8080/auth/admin/uploadquestion/${localStorage.getItem("quizid")}`,
+                `http://13.232.135.2:8080/auth/admin/uploadquestion/${localStorage.getItem("quizid")}`,
                 formData,
                 { headers: { "Content-Type": "multipart/form-data" } }
             );
@@ -76,7 +76,7 @@ function QuestionUpload() {
 
         try {
             const response = await axios.post(
-                `http://localhost:8080/auth/admin/aigenerate/${localStorage.getItem("quizid")}?${params}`
+                `http://13.232.135.2:8080/auth/admin/aigenerate/${localStorage.getItem("quizid")}?${params}`
             );
             setMessage(response.data);
             setStatus("success");

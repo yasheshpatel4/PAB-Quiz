@@ -24,7 +24,7 @@ export function AuthProvider({ children }) {
   const login = async (email, password, role) => {
     try {
       const endpoint =
-        role === "admin" ? "http://localhost:8080/auth/admin/login" : "http://localhost:8080/auth/student/login"
+        role === "admin" ? "http://13.232.135.2:8080/auth/admin/login" : "http://13.232.135.2:8080/auth/student/login"
 
       const data = role === "admin" ? { email, password } : { email, studentID: password }
 
@@ -48,7 +48,7 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     try {
       const endpoint =
-        user.role === "admin" ? "http://localhost:8080/auth/admin/logout" : "http://localhost:8080/api/students/logout"
+        user.role === "admin" ? "http://13.232.135.2:8080/auth/admin/logout" : "http://13.232.135.2:8080/api/students/logout"
 
       await axios.post(
         endpoint,

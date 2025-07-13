@@ -43,7 +43,7 @@ const LoginSignup = () => {
         if (isSignup) {
             // Sign up logic
             axios
-                .post("http://localhost:8080/auth/admin/signup", data)
+                .post("http://13.232.135.2:8080/auth/admin/signup", data)
                 .then((response) => {
                     alert(response.data);
                     setName("");
@@ -56,7 +56,7 @@ const LoginSignup = () => {
         } else {
             // Login logic
             axios
-                .post("http://localhost:8080/auth/admin/login", data)
+                .post("http://13.232.135.2:8080/auth/admin/login", data)
                 .then((response) => {
                     localStorage.setItem("adminEmail", email);
                     navigate("/admin"); 

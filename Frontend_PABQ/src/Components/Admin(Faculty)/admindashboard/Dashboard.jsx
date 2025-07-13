@@ -32,7 +32,7 @@ const Dashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/auth/admin/noofstudents', {
+      const response = await axios.get('http://13.232.135.2:8080/auth/admin/noofstudents', {
         params:{email:localStorage.getItem("adminEmail")}
       });
       setTotalStudents(response.data);
@@ -43,7 +43,7 @@ const Dashboard = () => {
 
   const fetchDashboardQuiz = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/auth/admin/noofquiz', {
+      const response = await axios.get('http://13.232.135.2:8080/auth/admin/noofquiz', {
         params: { email: localStorage.getItem("adminEmail") }
       });
       setTotalQuiz(response.data);
@@ -101,7 +101,7 @@ const Dashboard = () => {
 
       try {
         const response = await axios.post(
-          'http://localhost:8080/auth/admin/addstudentdata',
+          'http://13.232.135.2:8080/auth/admin/addstudentdata',
           studentData,
           {
             params: { adminEmail: localStorage.getItem("adminEmail") },
@@ -132,7 +132,7 @@ const Dashboard = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:8080/auth/admin/createquiz', quizForm, {
+      const response = await axios.post('http://13.232.135.2:8080/auth/admin/createquiz', quizForm, {
         params: { adminEmail: adminEmail },
       });
       alert(response.data);

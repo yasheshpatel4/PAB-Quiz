@@ -50,7 +50,7 @@ function Students() {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/auth/admin/getallstudents", {
+        const response = await axios.get("http://13.232.135.2:8080/auth/admin/getallstudents", {
           params: { email: localStorage.getItem("adminEmail") }
         })
         const studentsData = Array.isArray(response.data) ? response.data : []
@@ -89,7 +89,7 @@ function Students() {
       }
       
       const response = await axios.patch(
-        `http://localhost:8080/auth/admin/updatestudent/${editingStudent.studentID}`,
+        `http://13.232.135.2:8080/auth/admin/updatestudent/${editingStudent.studentID}`,
         editingStudent,
       )
       
@@ -114,7 +114,7 @@ function Students() {
     if (!confirmed) return
 
     try {
-      const response = await axios.delete(`http://localhost:8080/auth/admin/deletestudent/${id}`, {
+      const response = await axios.delete(`http://13.232.135.2:8080/auth/admin/deletestudent/${id}`, {
         params: { email: localStorage.getItem("adminEmail") }
       })
       setStudents(students.filter((student) => student.studentID !== id))
@@ -144,7 +144,7 @@ function Students() {
       }
 
       // Fetch basic student data
-      const studentsResponse = await axios.get("http://localhost:8080/auth/admin/getallstudents", {
+      const studentsResponse = await axios.get("http://13.232.135.2:8080/auth/admin/getallstudents", {
         params: { email: localStorage.getItem("adminEmail") }
       })
       const studentsData = studentsResponse.data
@@ -177,7 +177,7 @@ function Students() {
           // Fetch and add scores if selected
           if (selectedColumns.scores) {
             try {
-              const scoresResponse = await axios.get("http://localhost:8080/api/students/completedquiz", {
+              const scoresResponse = await axios.get("http://13.232.135.2:8080/api/students/completedquiz", {
                 params: {
                   studentEmail: student.email,
                   studentID: student.studentID,

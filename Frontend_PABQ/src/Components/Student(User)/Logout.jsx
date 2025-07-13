@@ -10,7 +10,7 @@ function Logout() {
   const handleLogout = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/students/logout",
+        "http://13.232.135.2:8080/api/students/logout",
         {},
         {
           headers: {
